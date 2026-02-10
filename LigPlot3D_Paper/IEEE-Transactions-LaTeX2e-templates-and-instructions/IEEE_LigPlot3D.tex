@@ -1,36 +1,39 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% This is a model paper for LigPlot3D using the achemso class
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\documentclass[journal=jacsat,manuscript=article]{achemso}
-
-\usepackage[version=3]{mhchem} % Formula subscripts using \ce{}
+\documentclass[lettersize,journal]{IEEEtran}
+\usepackage{amsmath,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{array}
+\usepackage[caption=false,font=normalsize,labelfont=sf,textfont=sf]{subfig}
+\usepackage{textcomp}
+\usepackage{stfloats}
+\usepackage{url}
+\usepackage{verbatim}
 \usepackage{graphicx}
-\usepackage{float}
-\usepackage{xspace}
-\usepackage{caption}
-\usepackage{subcaption}
-\usepackage[dvipsnames]{xcolor}
 \usepackage{hyperref}
-\usepackage{comment}
-\newcommand*\mycommand[1]{\texttt{\emph{#1}}}
-
-\author{Nitin Kumar Singh}
-\affiliation[Indian Institute of Technology (IIT) Gandhinagar]
-{Discipline of Chemical Engineering, Indian Institute of Technology (IIT) Gandhinagar, Palaj, Gujarat 382355, India}
-\email{singh_nitin@iitgn.ac.in}
-
-\title[LigPlot3D]
-  {LigPlot3D: An Interactive Web-Based Framework for Geometric Analysis of Protein-Ligand Interactions}
-
-\abbreviations{PDB, NGL, GUI, API}
-\keywords{Molecular Docking, Visualization, Web Application, Interaction Analysis}
+\usepackage{cite}
+\hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
+% updated with editorial comments 8/9/2021
 
 \begin{document}
+
+\title{LigPlot3D: An Interactive Web-Based Framework for Geometric Analysis of Protein-Ligand Interactions}
+
+\author{Nitin Kumar Singh
+\thanks{N. K. Singh is with the Discipline of Chemical Engineering, Indian Institute of Technology (IIT) Gandhinagar, Palaj, Gujarat 382355, India (e-mail: singh_nitin@iitgn.ac.in).}}
+
+% The paper headers
+%\markboth{Journal of \LaTeX\ Class Files,~Vol.~14, No.~8, August~2021}%
+%{Singh: LigPlot3D: An Interactive Web-Based Framework}
+
+\maketitle
 
 \begin{abstract}
 Molecular docking studies routinely generate multiple candidate binding poses, creating a practical need for rapid and interpretable inspection of protein--ligand interactions beyond numerical scoring functions. While established tools provide comprehensive interaction profiling or schematic visualization, they often require local installation or produce static outputs that limit interactive exploration. Here, this work presents \textit{LigPlot3D}, a web-based application for interactive, client-side analysis of protein--ligand complexes. LigPlot3D combines browser-native three-dimensional molecular rendering with deterministic, geometry-based identification of key non-covalent interactions, including hydrogen bonds, salt bridges, hydrophobic contacts, $\pi$-stacking, and halogen bonds. All analysis is performed locally within the browser, ensuring data privacy and eliminating server-side dependencies. Using representative docking complexes, LigPlot3D enables rapid qualitative assessment of binding modes and interaction geometry through an intuitive interface that integrates interactive visualization with structured interaction tables. By emphasizing accessibility, interactivity, and reproducible geometric criteria, LigPlot3D complements existing interaction profilers and visualization tools and supports efficient post-docking analysis in early-stage structure-based workflows. LigPlot3D is freely available at \url{https://singhnitink.github.io/LigPlot3D/}, and its source code can be cloned from GitHub and run locally using npm for offline or customized use.
 \end{abstract}
 
+\begin{IEEEkeywords}
+Molecular Docking, Visualization, Web Application, Interaction Analysis.
+\end{IEEEkeywords}
 
 \section{Introduction}
 Molecular docking remains a widely used computational approach for predicting plausible binding modes and approximate affinities of small molecules in protein binding sites~\cite{paggi2024art}, supporting structure-based drug discovery workflows and virtual screening pipelines \cite{trott2010autodockvina}. In practice, docking campaigns typically generate multiple poses per ligand (and often multiple ligands per target), creating an immediate downstream need for rapid, reliable inspection of poses, ranking consistency, and the chemical plausibility of predicted binding modes. Beyond numerical scores, the interpretability of docking results often depends on verifying whether a pose reproduces key physicochemical determinants of binding, such as hydrogen-bond patterns and local contact geometry in the binding site.
@@ -67,7 +70,7 @@ Salt bridges are defined as electrostatic interactions between oppositely charge
 \subsubsection{Hydrophobic Contacts}
 Hydrophobic contacts are detected between non-polar carbon atoms, including both aliphatic and aromatic carbons. A distance cutoff of 4.5~\AA\ is applied to capture van der Waals contacts that contribute to hydrophobic stabilization within the binding site.
 
-\subsubsection{$\pi$-Stacking Interactions}
+\subsubsection{\texorpdfstring{$\pi$}{π}-Stacking Interactions}
 Aromatic interactions are evaluated for residues containing planar ring systems, including phenylalanine, tyrosine, tryptophan, and histidine. Ring centroids and plane normals are computed to classify interaction geometry. Interactions are assigned when the centroid–centroid distance is less than or equal to 5.5~\AA. Parallel stacking interactions require an inter-planar angle of $30^{\circ}$ or less with a lateral offset not exceeding 2.0~\AA, while T-shaped stacking interactions are identified by inter-planar angles greater than or equal to $60^{\circ}$.
 
 \subsubsection{Halogen Bonds}
@@ -94,27 +97,17 @@ All visualization and interaction analysis in LigPlot3D is executed client-side 
 
 This deployment model lowers the barrier to entry for docking result inspection and facilitates rapid review of binding hypotheses, making the tool suitable for early-stage pose triage, educational use, and collaborative discussion settings.
 
-\begin{figure}[H]
+\begin{figure*}[t!]
     \centering
     \includegraphics[width=0.95\textwidth]{webpage_snapshot.png}
-   \caption{User interface and workflow of the LigPlot3D web application. 
-   	The clean and minimal interface of LigPlot3D is organized into four functional regions to streamline protein--ligand interaction analysis. 
-   	(a) Control center: The left-hand panel provides target selection and visualization controls, allowing users to select ligands, adjust representation styles (e.g., cartoon, ball-and-stick), define pocket residue display modes, customize ligand coloring, and filter interaction types such as hydrogen bonds, salt bridges, $\pi$-stacking, hydrophobic contacts, and halogen bonds. 
-   	(b) Structure input module: Users can upload a local PDB file or directly enter a PDB identifier to rapidly load and visualize a protein structure, enabling seamless integration with publicly available structural data. 
-   	(c) Main visualization canvas: The central 3D rendering window displays the protein--ligand complex with interactive controls for zooming, rotation, and inspection of atomic interactions. Intermolecular interactions are represented with color-coded dashed lines for intuitive interpretation. 
-   	(d) Analysis pane: A structured interaction table summarizes detected contacts, including interaction type, distance metrics, ligand atom identifiers, and corresponding protein residues and atoms, facilitating quantitative evaluation and reproducible reporting of binding interactions.}
-   
+    \caption{User interface and workflow of the LigPlot3D web application. 
+    	The clean and minimal interface of LigPlot3D is organized into four functional regions to streamline protein--ligand interaction analysis. 
+    	(a) Control center: The left-hand panel provides target selection and visualization controls. 
+    	(b) Structure input module: Users can upload a local PDB file or directly enter a PDB identifier. 
+    	(c) Main visualization canvas: The central 3D rendering window displays the protein--ligand complex. 
+    	(d) Analysis pane: A structured interaction table summarizes detected contacts.}
     \label{fig:initial}
-\end{figure}
-
-\begin{comment}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{Figures/loaded_view.png}
-    \caption{Interactive analysis of the Macrophage Migration Inhibitory Factor (MIF) complex\cite{crichlow2009structural}. LigPlot3D detects and visualizes hydrogen bonds (dashed lines), hydrophobic contacts, and $\pi$-stacking interactions in 3D. The sidebar provides granular control over visualization parameters and a detailed interaction table.}
-    \label{fig:loaded}
-\end{figure}
-\end{comment}
+\end{figure*}
 
 \subsection{Comparison with Existing Tools}
 To contextualize LigPlot3D within the landscape of interaction analysis and visualization tools, its functionality was compared with LigPlot+\cite{laskowski2011ligplot+} and the Protein--Ligand Interaction Profiler (PLIP)\cite{salentin2015plip,schake2025plip}.
@@ -130,16 +123,17 @@ By performing all parsing, visualization, and interaction analysis client-side, 
 
 LigPlot3D is particularly well suited for early-stage docking analysis, educational use, and rapid inspection of binding hypotheses where intuitive exploration of interaction geometry is essential. Future development will focus on extending supported interaction annotations, incorporating optional energy-related descriptors, and enabling analysis of time-resolved structural data such as molecular dynamics trajectories.
 
-\section{Data and Software Availability}
+\section*{Data and Software Availability}
 LigPlot3D is open-source software released under the MIT License.
 \begin{itemize}
     \item \textbf{Web Application:} \href{https://singhnitink.github.io/LigPlot3D/}{https://singhnitink.github.io/LigPlot3D/}
     \item \textbf{Source Code:} \href{https://github.com/singhnitink/LigPlot3D}{https://github.com/singhnitink/LigPlot3D}
 \end{itemize}
 
-\section{Conflicts of Interest}
+\section*{Conflicts of Interest}
 The author declares no conflict of interest.
 
+\bibliographystyle{IEEEtran}
 \bibliography{references}
 
 \end{document}

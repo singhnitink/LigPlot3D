@@ -1,0 +1,35 @@
+\documentclass[11pt]{letter}
+\usepackage[margin=1in]{geometry}
+\usepackage{url}
+
+\signature{Nitin Kumar Singh\\
+Discipline of Chemical Engineering\\
+Indian Institute of Technology (IIT) Gandhinagar\\
+Palaj, Gujarat 382355, India\\
+singh\_nitin@iitgn.ac.in}
+
+\date{\today}
+
+\begin{document}
+
+\begin{letter}{Editor-in-Chief\\
+IEEE Transactions on Computational Biology and Bioinformatics}
+
+\opening{Dear Editor,}
+
+I am writing to submit a manuscript titled \textbf{``LigPlot3D: An Interactive Web-Based Framework for Geometric Analysis of Protein-Ligand Interactions''} for consideration in \textit{IEEE Transactions on Computational Biology and Bioinformatics}.
+
+Molecular docking is widely used in structure-based drug discovery, but inspecting and comparing the resulting binding poses across multiple ligands remains a practical bottleneck. Existing tools either require local installation, produce static outputs, or are designed primarily for batch profiling rather than interactive exploration. This creates a gap for researchers who need quick, visual feedback on docking results without a heavy setup.
+
+LigPlot3D addresses this gap. It is a web-based application that runs entirely in the browser, combining 3D molecular visualization with geometry-based detection of hydrogen bonds, salt bridges, hydrophobic contacts, $\pi$-stacking, and halogen bonds. Because everything runs client-side, there is no data upload, no server dependency, and no installation. Users can load a PDB file, inspect binding poses, and compare interaction profiles within seconds.
+
+The tool is built with React.js and uses NGL Viewer and 3Dmol.js for rendering. Interaction detection follows standard distance and angle cutoffs from the structural biology literature, and all thresholds are documented in the application interface for transparency. The application is freely available at \url{https://singhnitink.github.io/LigPlot3D/} and can also be cloned from GitHub and run locally using npm.
+
+I believe this work fits the scope of your journal as it presents a computational tool that directly supports biological structure analysis and drug discovery workflows. The manuscript has not been published elsewhere and is not under consideration at any other journal.
+
+Thank you for considering this submission.
+
+\closing{Sincerely,}
+
+\end{letter}
+\end{document}

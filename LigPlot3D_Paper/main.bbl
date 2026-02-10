@@ -6,8 +6,7 @@
 \providecommand{\doi@aux}[1]{\endgroup\texttt{#1}}
 \makeatother
 \providecommand*\mcitethebibliography{\thebibliography}
-\csname @ifundefined\endcsname{endmcitethebibliography}
-  {\let\endmcitethebibliography\endthebibliography}{}
+\csname @ifundefined\endcsname{endmcitethebibliography}  {\let\endmcitethebibliography\endthebibliography}{}
 \begin{mcitethebibliography}{10}
 \providecommand*\natexlab[1]{#1}
 \providecommand*\mciteSetBstSublistMode[1]{}
@@ -26,77 +25,56 @@
   {\relax}
   {\relax}
 
+\bibitem[Paggi \latin{et~al.}(2024)Paggi, Pandit, and Dror]{paggi2024art}
+Paggi,~J.~M.; Pandit,~A.; Dror,~R.~O. The art and science of molecular docking. \emph{Annual review of biochemistry} \textbf{2024}, \emph{93}, 389--410\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
 \bibitem[Trott and Olson(2010)Trott, and Olson]{trott2010autodockvina}
-Trott,~O.; Olson,~A.~J. AutoDock Vina: Improving the speed and accuracy of
-  docking with a new scoring function, efficient optimization, and
-  multithreading. \emph{Journal of Computational Chemistry} \textbf{2010},
-  \emph{31}, 455--461\relax
+Trott,~O.; Olson,~A.~J. AutoDock Vina: improving the speed and accuracy of docking with a new scoring function, efficient optimization, and multithreading. \emph{Journal of computational chemistry} \textbf{2010}, \emph{31}, 455--461\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[Salentin \latin{et~al.}(2015)Salentin, Schreiber, Haupt, Adasme, and
-  Schroeder]{salentin2015plip}
-Salentin,~S.; Schreiber,~S.; Haupt,~V.~J.; Adasme,~M.~F.; Schroeder,~M. {PLIP}:
-  fully automated protein--ligand interaction profiler. \emph{Nucleic Acids
-  Research} \textbf{2015}, \emph{43}, W443--W447\relax
+\bibitem[Salentin \latin{et~al.}(2015)Salentin, Schreiber, Haupt, Adasme, and Schroeder]{salentin2015plip}
+Salentin,~S.; Schreiber,~S.; Haupt,~V.~J.; Adasme,~M.~F.; Schroeder,~M. PLIP: fully automated protein--ligand interaction profiler. \emph{Nucleic acids research} \textbf{2015}, \emph{43}, W443--W447\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[Schake \latin{et~al.}(2025)Schake, Bolz, \latin{et~al.}
-  others]{schake2025plip}
-Schake,~P.; Bolz,~S.~N.; others {PLIP} 2025: introducing protein--protein
-  interactions to the protein--ligand interaction profiler. \emph{Nucleic Acids
-  Research} \textbf{2025}, \emph{53}, W463--W472\relax
+\bibitem[Schake \latin{et~al.}(2025)Schake, Bolz, Linnemann, and Schroeder]{schake2025plip}
+Schake,~P.; Bolz,~S.~N.; Linnemann,~K.; Schroeder,~M. PLIP 2025: introducing protein--protein interactions to the protein--ligand interaction profiler. \emph{Nucleic Acids Research} \textbf{2025}, gkaf361\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[Laskowski and Swindells(2011)Laskowski, and
-  Swindells]{laskowski2011ligplotplus}
-Laskowski,~R.~A.; Swindells,~M.~B. LigPlot+: multiple ligand--protein
-  interaction diagrams for drug discovery. \emph{Journal of Chemical
-  Information and Modeling} \textbf{2011}, \emph{51}, 2778--2786\relax
+\bibitem[Laskowski and Swindells(2011)Laskowski, and Swindells]{laskowski2011ligplot+}
+Laskowski,~R.~A.; Swindells,~M.~B. LigPlot+: multiple ligand--protein interaction diagrams for drug discovery. 2011\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[{Meta Platforms Inc.}(2024)]{reactjs}
-{Meta Platforms Inc.} React: A JavaScript library for building user interfaces.
-  \url{https://react.dev/}, 2024; Accessed: 2026-01-22\relax
+\bibitem[Aggarwal \latin{et~al.}(2018)Aggarwal, \latin{et~al.} others]{reactjs}
+Aggarwal,~S.; others Modern web-development using reactjs. \emph{International Journal of Recent Research Aspects} \textbf{2018}, \emph{5}, 133--137\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[You(2024)]{vitejs}
-You,~E. Vite: Next Generation Frontend Tooling. \url{https://vitejs.dev/},
-  2024; Accessed: 2026-01-22\relax
-\mciteBstWouldAddEndPuncttrue
-\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
-{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
-\EndOfBibitem
-\bibitem[Rose \latin{et~al.}(2018)Rose, Bradley, Valasatava, Duarte, Prli{\'c},
-  and Rose]{rose2018ngl}
-Rose,~A.~S.; Bradley,~A.~R.; Valasatava,~Y.; Duarte,~J.~M.; Prli{\'c},~A.;
-  Rose,~P.~W. NGL viewer: web-based molecular graphics for large complexes.
-  \emph{Bioinformatics} \textbf{2018}, \emph{34}, 3755--3758\relax
+\bibitem[Rose and Hildebrand(2015)Rose, and Hildebrand]{rose2018ngl}
+Rose,~A.~S.; Hildebrand,~P.~W. NGL Viewer: a web application for molecular visualization. \emph{Nucleic acids research} \textbf{2015}, \emph{43}, W576--W579\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
 \bibitem[Rego and Koes(2015)Rego, and Koes]{rego20153dmol}
-Rego,~N.; Koes,~D.~R. 3Dmol. js: molecular visualization with WebGL.
-  \emph{Bioinformatics} \textbf{2015}, \emph{31}, 1322--1324\relax
+Rego,~N.; Koes,~D.~R. 3Dmol. js: molecular visualization with WebGL. \emph{Bioinformatics} \textbf{2015}, \emph{31}, 1322--1324\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[Crichlow \latin{et~al.}(2009)Crichlow, Lubetsky, Leng, Bucala, and
-  Lolis]{crichlow2009structural}
-Crichlow,~G.~V.; Lubetsky,~J.~B.; Leng,~L.; Bucala,~R.; Lolis,~E.~J. Structural
-  and Kinetic Analyses of Macrophage Migration Inhibitory Factor Active Site
-  Interactions. \emph{Biochemistry} \textbf{2009}, \emph{48}, 132--139\relax
+\bibitem[Crichlow \latin{et~al.}(2009)Crichlow, Lubetsky, Leng, Bucala, and Lolis]{crichlow2009structural}
+Crichlow,~G.~V.; Lubetsky,~J.~B.; Leng,~L.; Bucala,~R.; Lolis,~E.~J. Structural and kinetic analyses of macrophage migration inhibitory factor active site interactions. \emph{Biochemistry} \textbf{2009}, \emph{48}, 132--139\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
