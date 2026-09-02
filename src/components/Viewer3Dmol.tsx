@@ -116,25 +116,28 @@ const Viewer3Dmol: React.FC<Props> = ({
         }
 
         // 1. Protein Style (context)
-        if (visualSettings.proteinStyle !== 'hidden') {
+        // Opacity is user-controlled (Protein Opacity slider) so the receptor can be
+        // faded back to keep the ligand readable, or made solid for context.
+        if (visualSettings.proteinStyle !== 'hidden' && visualSettings.proteinOpacity > 0) {
             let styleObj: any = {};
             const color = '#cccccc';
+            const opacity = visualSettings.proteinOpacity;
 
             switch (visualSettings.proteinStyle) {
                 case 'cartoon':
-                    styleObj = { cartoon: { color: color, opacity: 0.15 } };
+                    styleObj = { cartoon: { color: color, opacity: opacity } };
                     break;
                 case 'rope': // Tube in 3Dmol
-                    styleObj = { cartoon: { color: color, style: 'trace', radius: 0.3 } }; // approximate
+                    styleObj = { cartoon: { color: color, style: 'trace', radius: 0.3, opacity: opacity } }; // approximate
                     break;
                 case 'trace':
-                    styleObj = { stick: { radius: 0.2, color: color } }; // approximate backbone
+                    styleObj = { stick: { radius: 0.2, color: color, opacity: opacity } }; // approximate backbone
                     break;
                 case 'line':
-                    styleObj = { line: { color: color } };
+                    styleObj = { line: { color: color, opacity: opacity } };
                     break;
                 default:
-                    styleObj = { cartoon: { color: color } };
+                    styleObj = { cartoon: { color: color, opacity: opacity } };
             }
 
             // Apply to everything NOT ligand

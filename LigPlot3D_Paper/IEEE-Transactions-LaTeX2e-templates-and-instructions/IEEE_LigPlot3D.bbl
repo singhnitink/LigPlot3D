@@ -27,24 +27,25 @@ J.~M. Paggi, A.~Pandit, and R.~O. Dror, ``The art and science of molecular
   389--410, 2024.
 
 \bibitem{trott2010autodockvina}
-O.~Trott and A.~J. Olson, ``Autodock vina: improving the speed and accuracy of
-  docking with a new scoring function, efficient optimization, and
+O.~Trott and A.~J. Olson, ``{AutoDock Vina}: improving the speed and accuracy
+  of docking with a new scoring function, efficient optimization, and
   multithreading,'' \emph{Journal of computational chemistry}, vol.~31, no.~2,
   pp. 455--461, 2010.
 
 \bibitem{salentin2015plip}
-S.~Salentin, S.~Schreiber, V.~J. Haupt, M.~F. Adasme, and M.~Schroeder, ``Plip:
-  fully automated protein--ligand interaction profiler,'' \emph{Nucleic acids
-  research}, vol.~43, no.~W1, pp. W443--W447, 2015.
+S.~Salentin, S.~Schreiber, V.~J. Haupt, M.~F. Adasme, and M.~Schroeder,
+  ``{PLIP}: fully automated protein--ligand interaction profiler,''
+  \emph{Nucleic acids research}, vol.~43, no.~W1, pp. W443--W447, 2015.
 
 \bibitem{schake2025plip}
-P.~Schake, S.~N. Bolz, K.~Linnemann, and M.~Schroeder, ``Plip 2025: introducing
-  protein--protein interactions to the protein--ligand interaction profiler,''
-  \emph{Nucleic Acids Research}, p. gkaf361, 2025.
+P.~Schake, S.~N. Bolz, K.~Linnemann, and M.~Schroeder, ``{PLIP} 2025:
+  introducing protein--protein interactions to the protein--ligand interaction
+  profiler,'' \emph{Nucleic Acids Research}, p. gkaf361, 2025.
 
 \bibitem{laskowski2011ligplot+}
-R.~A. Laskowski and M.~B. Swindells, ``Ligplot+: multiple ligand--protein
-  interaction diagrams for drug discovery,'' 2011.
+R.~A. Laskowski and M.~B. Swindells, ``{LigPlot+}: multiple ligand--protein
+  interaction diagrams for drug discovery,'' \emph{Journal of Chemical
+  Information and Modeling}, vol.~51, no.~10, pp. 2778--2786, 2011.
 
 \bibitem{reactjs}
 S.~Aggarwal \emph{et~al.}, ``Modern web-development using reactjs,''
@@ -52,12 +53,12 @@ S.~Aggarwal \emph{et~al.}, ``Modern web-development using reactjs,''
   133--137, 2018.
 
 \bibitem{rose2018ngl}
-A.~S. Rose and P.~W. Hildebrand, ``Ngl viewer: a web application for molecular
-  visualization,'' \emph{Nucleic acids research}, vol.~43, no.~W1, pp.
-  W576--W579, 2015.
+A.~S. Rose and P.~W. Hildebrand, ``{NGL Viewer}: a web application for
+  molecular visualization,'' \emph{Nucleic acids research}, vol.~43, no.~W1,
+  pp. W576--W579, 2015.
 
 \bibitem{rego20153dmol}
-N.~Rego and D.~R. Koes, ``3dmol. js: molecular visualization with webgl,''
+N.~Rego and D.~R. Koes, ``{3Dmol.js}: molecular visualization with {WebGL},''
   \emph{Bioinformatics}, vol.~31, no.~8, pp. 1322--1324, 2015.
 
 \bibitem{bakerhubbard1984hbond}
@@ -112,25 +113,24 @@ H.~C. Jubb, A.~P. Higueruelo, B.~Ochoa-Monta{\~n}o, W.~R. Pitt, D.~B. Ascher,
   Biology}, vol. 429, no.~3, pp. 365--371, 2017.
 
 \bibitem{bouysset2021prolif}
-C.~Bouysset and S.~Fiorucci, ``Prolif: a library to encode molecular
+C.~Bouysset and S.~Fiorucci, ``{ProLIF}: a library to encode molecular
   interactions as fingerprints,'' \emph{Journal of Cheminformatics}, vol.~13,
   p.~72, 2021.
 
 \bibitem{vangone2011cocomaps}
-A.~Vangone, R.~Spinelli, V.~Scarano, L.~Cavallo, and R.~Oliva, ``Cocomaps: a
+A.~Vangone, R.~Spinelli, V.~Scarano, L.~Cavallo, and R.~Oliva, ``{COCOMAPS}: a
   web application to analyze and visualize contacts at the interface of
   biomolecular complexes,'' \emph{Bioinformatics}, vol.~27, no.~20, pp.
   2915--2916, 2011.
 
 \bibitem{chawla2025cocomaps2}
 M.~Chawla, U.~Kalra, A.~Petta, S.~Sharma, A.~R. Shaikh, L.~Cavallo, and
-  R.~Oliva, ``Cocomaps 2.0: a web server for identifying, analyzing, and
+  R.~Oliva, ``{COCOMAPS} 2.0: a web server for identifying, analyzing, and
   visualizing atomic interactions at the interface of biomolecular complexes,''
   \emph{Bioinformatics}, vol.~41, no.~12, p. btaf606, 2025.
 
 \bibitem{plipconfig}
-S.~Salentin and M.~Schroeder, ``plip (source code repository): {\tt
-  plip/basic/config.py},'' \url{https://github.com/pharmai/plip}, 2026,
-  accessed September 2026.
+{PharmAI GmbH}, ``plip (source code repository): {\tt plip/basic/config.py},''
+  \url{https://github.com/pharmai/plip}, 2026, accessed September 2026.
 
 \end{thebibliography}

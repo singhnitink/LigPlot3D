@@ -17,6 +17,7 @@ export interface VisualSettings {
   pocketStyle: 'licorice' | 'ball+stick' | 'stick';
   interactionWidth: number;
   ligandColor: string;
+  proteinOpacity: number;
 }
 
 const App: React.FC = () => {
@@ -46,7 +47,8 @@ const App: React.FC = () => {
     ligandStyle: 'ball+stick',
     pocketStyle: 'stick',
     interactionWidth: 2.0,
-    ligandColor: '#22c55e'
+    ligandColor: '#22c55e',
+    proteinOpacity: 0.15
   });
 
   const [recenterTrigger, setRecenterTrigger] = useState(0);
@@ -326,6 +328,46 @@ const App: React.FC = () => {
                         <option value="ball+stick">Ball & Stick</option>
                       </select>
                     </div>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[10px] font-bold text-slate-500">
+                        Protein Opacity
+                      </label>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => setVisualSettings({ ...visualSettings, proteinOpacity: 0.15 })}
+                          disabled={visualSettings.proteinStyle === 'hidden'}
+                          className="text-[9px] px-1.5 py-0.5 rounded border border-slate-200 text-slate-500 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed"
+                          title="Make the protein nearly transparent"
+                        >
+                          Faint
+                        </button>
+                        <button
+                          onClick={() => setVisualSettings({ ...visualSettings, proteinOpacity: 1 })}
+                          disabled={visualSettings.proteinStyle === 'hidden'}
+                          className="text-[9px] px-1.5 py-0.5 rounded border border-slate-200 text-slate-500 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed"
+                          title="Make the protein fully opaque"
+                        >
+                          Solid
+                        </button>
+                        <span className="text-[10px] font-mono text-slate-400 w-8 text-right tabular-nums">
+                          {Math.round(visualSettings.proteinOpacity * 100)}%
+                        </span>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value={Math.round(visualSettings.proteinOpacity * 100)}
+                      onChange={e => setVisualSettings({ ...visualSettings, proteinOpacity: parseInt(e.target.value) / 100 })}
+                      disabled={visualSettings.proteinStyle === 'hidden'}
+                      className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                      title="Adjust how transparent the protein appears"
+                    />
                   </div>
 
                   <div>

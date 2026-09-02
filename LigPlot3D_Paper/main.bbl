@@ -34,7 +34,7 @@ Paggi,~J.~M.; Pandit,~A.; Dror,~R.~O. The art and science of molecular docking.
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
 \bibitem[Trott and Olson(2010)Trott, and Olson]{trott2010autodockvina}
-Trott,~O.; Olson,~A.~J. AutoDock Vina: improving the speed and accuracy of
+Trott,~O.; Olson,~A.~J. {AutoDock Vina}: improving the speed and accuracy of
   docking with a new scoring function, efficient optimization, and
   multithreading. \emph{Journal of computational chemistry} \textbf{2010},
   \emph{31}, 455--461\relax
@@ -44,7 +44,7 @@ Trott,~O.; Olson,~A.~J. AutoDock Vina: improving the speed and accuracy of
 \EndOfBibitem
 \bibitem[Salentin \latin{et~al.}(2015)Salentin, Schreiber, Haupt, Adasme, and
   Schroeder]{salentin2015plip}
-Salentin,~S.; Schreiber,~S.; Haupt,~V.~J.; Adasme,~M.~F.; Schroeder,~M. PLIP:
+Salentin,~S.; Schreiber,~S.; Haupt,~V.~J.; Adasme,~M.~F.; Schroeder,~M. {PLIP}:
   fully automated protein--ligand interaction profiler. \emph{Nucleic acids
   research} \textbf{2015}, \emph{43}, W443--W447\relax
 \mciteBstWouldAddEndPuncttrue
@@ -53,7 +53,7 @@ Salentin,~S.; Schreiber,~S.; Haupt,~V.~J.; Adasme,~M.~F.; Schroeder,~M. PLIP:
 \EndOfBibitem
 \bibitem[Schake \latin{et~al.}(2025)Schake, Bolz, Linnemann, and
   Schroeder]{schake2025plip}
-Schake,~P.; Bolz,~S.~N.; Linnemann,~K.; Schroeder,~M. PLIP 2025: introducing
+Schake,~P.; Bolz,~S.~N.; Linnemann,~K.; Schroeder,~M. {PLIP} 2025: introducing
   protein--protein interactions to the protein--ligand interaction profiler.
   \emph{Nucleic Acids Research} \textbf{2025}, gkaf361\relax
 \mciteBstWouldAddEndPuncttrue
@@ -62,8 +62,9 @@ Schake,~P.; Bolz,~S.~N.; Linnemann,~K.; Schroeder,~M. PLIP 2025: introducing
 \EndOfBibitem
 \bibitem[Laskowski and Swindells(2011)Laskowski, and
   Swindells]{laskowski2011ligplot+}
-Laskowski,~R.~A.; Swindells,~M.~B. LigPlot+: multiple ligand--protein
-  interaction diagrams for drug discovery. 2011\relax
+Laskowski,~R.~A.; Swindells,~M.~B. {LigPlot+}: multiple ligand--protein
+  interaction diagrams for drug discovery. \emph{Journal of Chemical
+  Information and Modeling} \textbf{2011}, \emph{51}, 2778--2786\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
@@ -76,7 +77,7 @@ Aggarwal,~S.; others Modern web-development using reactjs. \emph{International
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
 \bibitem[Rose and Hildebrand(2015)Rose, and Hildebrand]{rose2018ngl}
-Rose,~A.~S.; Hildebrand,~P.~W. NGL Viewer: a web application for molecular
+Rose,~A.~S.; Hildebrand,~P.~W. {NGL Viewer}: a web application for molecular
   visualization. \emph{Nucleic acids research} \textbf{2015}, \emph{43},
   W576--W579\relax
 \mciteBstWouldAddEndPuncttrue
@@ -84,7 +85,7 @@ Rose,~A.~S.; Hildebrand,~P.~W. NGL Viewer: a web application for molecular
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
 \bibitem[Rego and Koes(2015)Rego, and Koes]{rego20153dmol}
-Rego,~N.; Koes,~D.~R. 3Dmol. js: molecular visualization with WebGL.
+Rego,~N.; Koes,~D.~R. {3Dmol.js}: molecular visualization with {WebGL}.
   \emph{Bioinformatics} \textbf{2015}, \emph{31}, 1322--1324\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
@@ -179,7 +180,7 @@ Jubb,~H.~C.; Higueruelo,~A.~P.; Ochoa-Monta{\~n}o,~B.; Pitt,~W.~R.;
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
 \bibitem[Bouysset and Fiorucci(2021)Bouysset, and Fiorucci]{bouysset2021prolif}
-Bouysset,~C.; Fiorucci,~S. ProLIF: a library to encode molecular interactions
+Bouysset,~C.; Fiorucci,~S. {ProLIF}: a library to encode molecular interactions
   as fingerprints. \emph{Journal of Cheminformatics} \textbf{2021}, \emph{13},
   72\relax
 \mciteBstWouldAddEndPuncttrue
@@ -188,8 +189,8 @@ Bouysset,~C.; Fiorucci,~S. ProLIF: a library to encode molecular interactions
 \EndOfBibitem
 \bibitem[Vangone \latin{et~al.}(2011)Vangone, Spinelli, Scarano, Cavallo, and
   Oliva]{vangone2011cocomaps}
-Vangone,~A.; Spinelli,~R.; Scarano,~V.; Cavallo,~L.; Oliva,~R. COCOMAPS: a web
-  application to analyze and visualize contacts at the interface of
+Vangone,~A.; Spinelli,~R.; Scarano,~V.; Cavallo,~L.; Oliva,~R. {COCOMAPS}: a
+  web application to analyze and visualize contacts at the interface of
   biomolecular complexes. \emph{Bioinformatics} \textbf{2011}, \emph{27},
   2915--2916\relax
 \mciteBstWouldAddEndPuncttrue
@@ -199,17 +200,16 @@ Vangone,~A.; Spinelli,~R.; Scarano,~V.; Cavallo,~L.; Oliva,~R. COCOMAPS: a web
 \bibitem[Chawla \latin{et~al.}(2025)Chawla, Kalra, Petta, Sharma, Shaikh,
   Cavallo, and Oliva]{chawla2025cocomaps2}
 Chawla,~M.; Kalra,~U.; Petta,~A.; Sharma,~S.; Shaikh,~A.~R.; Cavallo,~L.;
-  Oliva,~R. COCOMAPS 2.0: a web server for identifying, analyzing, and
+  Oliva,~R. {COCOMAPS} 2.0: a web server for identifying, analyzing, and
   visualizing atomic interactions at the interface of biomolecular complexes.
   \emph{Bioinformatics} \textbf{2025}, \emph{41}, btaf606\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[Salentin and Schroeder(2026)Salentin, and Schroeder]{plipconfig}
-Salentin,~S.; Schroeder,~M. plip (source code repository): {\tt
-  plip/basic/config.py}. \url{https://github.com/pharmai/plip}, 2026; Accessed
-  September 2026\relax
+\bibitem[{PharmAI GmbH}(2026)]{plipconfig}
+{PharmAI GmbH} plip (source code repository): {\tt plip/basic/config.py}.
+  \url{https://github.com/pharmai/plip}, 2026; Accessed September 2026\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
