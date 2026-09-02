@@ -2,7 +2,7 @@
 import * as NGL from 'ngl';
 import { InteractionType } from '../types';
 import { THRESHOLDS, ATOM_PROPS, COMMON_LIGANDS, IGNORED_RESIDUES } from '../constants';
-import { distance, getCenter, getPlaneNormal, angleBetween } from './geometryUtils';
+import { distance, getCenter, getPlaneNormal, angleBetween, angleDeg } from './geometryUtils';
 import type { AtomData, Interaction, ResidueOption, AnalysisResult } from '../types';
 
 const parseNGLAtom = (ap: any): AtomData => ({
@@ -64,6 +64,27 @@ const findLigandRings = (atoms: AtomData[]): AtomData[][] => {
   }
   return rings;
 };
+
+// --- Helper: Find nearest covalently-bonded atom of a given element ---
+// Used to recover the donor's hydrogen (for the D-H-A angle) or a halogen's
+// bonded carbon (for the C-X...A angle) when the structure provides one.
+const findBondedAtom = (center: AtomData, pool: AtomData[], element: string, maxDist: number): AtomData | null => {
+  let best: AtomData | null = null;
+  let bestDist = maxDist;
+  for (const a of pool) {
+    if (a.index === center.index) continue;
+    if (a.element.toUpperCase() !== element.toUpperCase()) continue;
+    const d = distance(center, a);
+    if (d < bestDist) {
+      bestDist = d;
+      best = a;
+    }
+  }
+  return best;
+};
+
+const BOND_DIST_XH = 1.3; // Generous N/O/S-H covalent bond length
+const BOND_DIST_CX = 2.2; // Generous C-halogen covalent bond length (covers C-I ~2.14 A)
 
 export const getLigandCandidates = (structure: NGL.Structure): ResidueOption[] => {
   // First pass: collect all potential ligand residues
@@ -361,7 +382,11 @@ export const analyzeInteractions = (
       if (dist > Math.max(THRESHOLDS.HBOND_DIST, THRESHOLDS.HYDROPHOBIC_DIST)) return;
 
       // Hydrogen Bond
-      // PLIP uses 4.1A and Angle > 90. We check Element types + Distance.
+      // Heavy-atom distance + donor/acceptor typing is always required (cf. Baker
+      // & Hubbard, 1984). When the donor's hydrogen is resolvable in the loaded
+      // structure, additionally enforce the D-H-A angle (cf. McDonald & Thornton,
+      // 1994); otherwise fall back to distance only, since most PDB/docking
+      // structures omit hydrogens.
       if (dist <= THRESHOLDS.HBOND_DIST) {
         const lIsDon = ATOM_PROPS.DONORS.has(lAtom.element);
         const lIsAcc = ATOM_PROPS.ACCEPTORS.has(lAtom.element);
@@ -374,28 +399,78 @@ export const analyzeInteractions = (
         const match2 = lIsAcc && pIsDon;
 
         if (match1 || match2) {
-          // Filter out C-connected donors if they aren't polar? 
-          // For now, assume defined ATOM_PROPS sets are strict enough (N, O, S, F).
-          interactions.push({
-            id: `hb-${idCounter++}`,
-            type: InteractionType.HydrogenBond,
-            distance: dist,
-            ligandAtom: lAtom,
-            proteinAtom: pAtom
-          });
+          // N, O and S are typed as both donor and acceptor, so a pair is usually
+          // assignable in either direction. Test every viable direction rather than
+          // only the ligand-as-donor one, otherwise the angle check gets skipped
+          // whenever the hydrogen sits on the protein side (e.g. Ser OG-H donating
+          // to a ligand carbonyl oxygen that carries no hydrogen of its own).
+          const candidates: { donor: AtomData; acceptor: AtomData; donorIsLigand: boolean }[] = [];
+          if (match1) candidates.push({ donor: lAtom, acceptor: pAtom, donorIsLigand: true });
+          if (match2) candidates.push({ donor: pAtom, acceptor: lAtom, donorIsLigand: false });
+
+          let hbAngle: number | undefined;
+          let angleOk = false;
+          let hasResolvableH = false;
+
+          for (const { donor, acceptor, donorIsLigand } of candidates) {
+            const donorPool = donorIsLigand
+              ? ligandAtoms
+              : (proteinResidues[`${donor.chain}:${donor.resNo}`] ?? relevantProteinAtoms);
+            const bondedH = findBondedAtom(donor, donorPool, 'H', BOND_DIST_XH);
+            if (!bondedH) continue;
+
+            hasResolvableH = true;
+            const angle = angleDeg(donor, bondedH, acceptor);
+            if (angle >= THRESHOLDS.HBOND_ANGLE) {
+              hbAngle = angle;
+              angleOk = true;
+              break;
+            }
+          }
+
+          // Neither candidate donor has a resolvable hydrogen, which is the norm for
+          // structures without explicit hydrogens. Fall back to distance alone.
+          if (!hasResolvableH) angleOk = true;
+
+          if (angleOk) {
+            interactions.push({
+              id: `hb-${idCounter++}`,
+              type: InteractionType.HydrogenBond,
+              distance: dist,
+              ligandAtom: lAtom,
+              proteinAtom: pAtom,
+              angle: hbAngle
+            });
+          }
         }
       }
 
       // Halogen Bond
+      // Distance + sigma-hole directionality (cf. Auffinger et al., 2004). The
+      // halogen is always singly bonded to exactly one ligand carbon, so the
+      // C-X...A angle is unconditionally well-defined here (no missing-hydrogen
+      // ambiguity, unlike the donor side of a hydrogen bond).
       if (ATOM_PROPS.HALOGENS.has(lAtom.element.toUpperCase()) && ATOM_PROPS.ACCEPTORS.has(pAtom.element)) {
         if (dist <= THRESHOLDS.HALOGEN_DIST) {
-          interactions.push({
-            id: `xb-${idCounter++}`,
-            type: InteractionType.HalogenBond,
-            distance: dist,
-            ligandAtom: lAtom,
-            proteinAtom: pAtom
-          });
+          const bondedC = findBondedAtom(lAtom, ligandAtoms, 'C', BOND_DIST_CX);
+
+          let xbAngle: number | undefined;
+          let angleOk = true;
+          if (bondedC) {
+            xbAngle = angleDeg(bondedC, lAtom, pAtom);
+            angleOk = xbAngle >= THRESHOLDS.HALOGEN_ANGLE;
+          }
+
+          if (angleOk) {
+            interactions.push({
+              id: `xb-${idCounter++}`,
+              type: InteractionType.HalogenBond,
+              distance: dist,
+              ligandAtom: lAtom,
+              proteinAtom: pAtom,
+              angle: xbAngle
+            });
+          }
         }
       }
 

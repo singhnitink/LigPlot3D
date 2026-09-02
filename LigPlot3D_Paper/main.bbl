@@ -6,8 +6,9 @@
 \providecommand{\doi@aux}[1]{\endgroup\texttt{#1}}
 \makeatother
 \providecommand*\mcitethebibliography{\thebibliography}
-\csname @ifundefined\endcsname{endmcitethebibliography}  {\let\endmcitethebibliography\endthebibliography}{}
-\begin{mcitethebibliography}{10}
+\csname @ifundefined\endcsname{endmcitethebibliography}
+  {\let\endmcitethebibliography\endthebibliography}{}
+\begin{mcitethebibliography}{23}
 \providecommand*\natexlab[1]{#1}
 \providecommand*\mciteSetBstSublistMode[1]{}
 \providecommand*\mciteSetBstMaxWidthForm[2]{}
@@ -26,55 +27,189 @@
   {\relax}
 
 \bibitem[Paggi \latin{et~al.}(2024)Paggi, Pandit, and Dror]{paggi2024art}
-Paggi,~J.~M.; Pandit,~A.; Dror,~R.~O. The art and science of molecular docking. \emph{Annual review of biochemistry} \textbf{2024}, \emph{93}, 389--410\relax
+Paggi,~J.~M.; Pandit,~A.; Dror,~R.~O. The art and science of molecular docking.
+  \emph{Annual review of biochemistry} \textbf{2024}, \emph{93}, 389--410\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
 \bibitem[Trott and Olson(2010)Trott, and Olson]{trott2010autodockvina}
-Trott,~O.; Olson,~A.~J. AutoDock Vina: improving the speed and accuracy of docking with a new scoring function, efficient optimization, and multithreading. \emph{Journal of computational chemistry} \textbf{2010}, \emph{31}, 455--461\relax
+Trott,~O.; Olson,~A.~J. AutoDock Vina: improving the speed and accuracy of
+  docking with a new scoring function, efficient optimization, and
+  multithreading. \emph{Journal of computational chemistry} \textbf{2010},
+  \emph{31}, 455--461\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[Salentin \latin{et~al.}(2015)Salentin, Schreiber, Haupt, Adasme, and Schroeder]{salentin2015plip}
-Salentin,~S.; Schreiber,~S.; Haupt,~V.~J.; Adasme,~M.~F.; Schroeder,~M. PLIP: fully automated protein--ligand interaction profiler. \emph{Nucleic acids research} \textbf{2015}, \emph{43}, W443--W447\relax
+\bibitem[Salentin \latin{et~al.}(2015)Salentin, Schreiber, Haupt, Adasme, and
+  Schroeder]{salentin2015plip}
+Salentin,~S.; Schreiber,~S.; Haupt,~V.~J.; Adasme,~M.~F.; Schroeder,~M. PLIP:
+  fully automated protein--ligand interaction profiler. \emph{Nucleic acids
+  research} \textbf{2015}, \emph{43}, W443--W447\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[Schake \latin{et~al.}(2025)Schake, Bolz, Linnemann, and Schroeder]{schake2025plip}
-Schake,~P.; Bolz,~S.~N.; Linnemann,~K.; Schroeder,~M. PLIP 2025: introducing protein--protein interactions to the protein--ligand interaction profiler. \emph{Nucleic Acids Research} \textbf{2025}, gkaf361\relax
+\bibitem[Schake \latin{et~al.}(2025)Schake, Bolz, Linnemann, and
+  Schroeder]{schake2025plip}
+Schake,~P.; Bolz,~S.~N.; Linnemann,~K.; Schroeder,~M. PLIP 2025: introducing
+  protein--protein interactions to the protein--ligand interaction profiler.
+  \emph{Nucleic Acids Research} \textbf{2025}, gkaf361\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[Laskowski and Swindells(2011)Laskowski, and Swindells]{laskowski2011ligplot+}
-Laskowski,~R.~A.; Swindells,~M.~B. LigPlot+: multiple ligand--protein interaction diagrams for drug discovery. 2011\relax
+\bibitem[Laskowski and Swindells(2011)Laskowski, and
+  Swindells]{laskowski2011ligplot+}
+Laskowski,~R.~A.; Swindells,~M.~B. LigPlot+: multiple ligand--protein
+  interaction diagrams for drug discovery. 2011\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
 \bibitem[Aggarwal \latin{et~al.}(2018)Aggarwal, \latin{et~al.} others]{reactjs}
-Aggarwal,~S.; others Modern web-development using reactjs. \emph{International Journal of Recent Research Aspects} \textbf{2018}, \emph{5}, 133--137\relax
+Aggarwal,~S.; others Modern web-development using reactjs. \emph{International
+  Journal of Recent Research Aspects} \textbf{2018}, \emph{5}, 133--137\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
 \bibitem[Rose and Hildebrand(2015)Rose, and Hildebrand]{rose2018ngl}
-Rose,~A.~S.; Hildebrand,~P.~W. NGL Viewer: a web application for molecular visualization. \emph{Nucleic acids research} \textbf{2015}, \emph{43}, W576--W579\relax
+Rose,~A.~S.; Hildebrand,~P.~W. NGL Viewer: a web application for molecular
+  visualization. \emph{Nucleic acids research} \textbf{2015}, \emph{43},
+  W576--W579\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
 \bibitem[Rego and Koes(2015)Rego, and Koes]{rego20153dmol}
-Rego,~N.; Koes,~D.~R. 3Dmol. js: molecular visualization with WebGL. \emph{Bioinformatics} \textbf{2015}, \emph{31}, 1322--1324\relax
+Rego,~N.; Koes,~D.~R. 3Dmol. js: molecular visualization with WebGL.
+  \emph{Bioinformatics} \textbf{2015}, \emph{31}, 1322--1324\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[Crichlow \latin{et~al.}(2009)Crichlow, Lubetsky, Leng, Bucala, and Lolis]{crichlow2009structural}
-Crichlow,~G.~V.; Lubetsky,~J.~B.; Leng,~L.; Bucala,~R.; Lolis,~E.~J. Structural and kinetic analyses of macrophage migration inhibitory factor active site interactions. \emph{Biochemistry} \textbf{2009}, \emph{48}, 132--139\relax
+\bibitem[Baker and Hubbard(1984)Baker, and Hubbard]{bakerhubbard1984hbond}
+Baker,~E.~N.; Hubbard,~R.~E. Hydrogen bonding in globular proteins.
+  \emph{Progress in Biophysics and Molecular Biology} \textbf{1984}, \emph{44},
+  97--179\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[McDonald and Thornton(1994)McDonald, and
+  Thornton]{mcdonaldthornton1994hbond}
+McDonald,~I.~K.; Thornton,~J.~M. Satisfying hydrogen bonding potential in
+  proteins. \emph{Journal of Molecular Biology} \textbf{1994}, \emph{238},
+  777--793\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Barlow and Thornton(1983)Barlow, and
+  Thornton]{barlowthornton1983saltbridge}
+Barlow,~D.~J.; Thornton,~J.~M. Ion-pairs in proteins. \emph{Journal of
+  Molecular Biology} \textbf{1983}, \emph{168}, 867--885\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Bissantz \latin{et~al.}(2010)Bissantz, Kuhn, and
+  Stahl]{bissantz2010medchem}
+Bissantz,~C.; Kuhn,~B.; Stahl,~M. A medicinal chemist's guide to molecular
+  interactions. \emph{Journal of Medicinal Chemistry} \textbf{2010}, \emph{53},
+  5061--5084\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[McGaughey \latin{et~al.}(1998)McGaughey, Gagn{\'e}, and
+  Rapp{\'e}]{mcgaughey1998pistacking}
+McGaughey,~G.~B.; Gagn{\'e},~M.; Rapp{\'e},~A.~K. {$\pi$}-stacking
+  interactions. Alive and well in proteins. \emph{Journal of Biological
+  Chemistry} \textbf{1998}, \emph{273}, 15458--15463\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Gallivan and Dougherty(1999)Gallivan, and
+  Dougherty]{gallivandougherty1999cationpi}
+Gallivan,~J.~P.; Dougherty,~D.~A. Cation-{$\pi$} interactions in structural
+  biology. \emph{Proceedings of the National Academy of Sciences}
+  \textbf{1999}, \emph{96}, 9459--9464\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Auffinger \latin{et~al.}(2004)Auffinger, Hays, Westhof, and
+  Ho]{auffinger2004halogenbonds}
+Auffinger,~P.; Hays,~F.~A.; Westhof,~E.; Ho,~P.~S. Halogen bonds in biological
+  molecules. \emph{Proceedings of the National Academy of Sciences}
+  \textbf{2004}, \emph{101}, 16789--16794\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Harding(2001)]{harding2001metalgeometry}
+Harding,~M.~M. Geometry of metal-ligand interactions in proteins. \emph{Acta
+  Crystallographica Section D: Biological Crystallography} \textbf{2001},
+  \emph{57}, 401--411\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Crichlow \latin{et~al.}(2009)Crichlow, Lubetsky, Leng, Bucala, and
+  Lolis]{crichlow2009structural}
+Crichlow,~G.~V.; Lubetsky,~J.~B.; Leng,~L.; Bucala,~R.; Lolis,~E.~J. Structural
+  and kinetic analyses of macrophage migration inhibitory factor active site
+  interactions. \emph{Biochemistry} \textbf{2009}, \emph{48}, 132--139\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Jubb \latin{et~al.}(2017)Jubb, Higueruelo, Ochoa-Monta{\~n}o, Pitt,
+  Ascher, and Blundell]{jubb2017arpeggio}
+Jubb,~H.~C.; Higueruelo,~A.~P.; Ochoa-Monta{\~n}o,~B.; Pitt,~W.~R.;
+  Ascher,~D.~B.; Blundell,~T.~L. Arpeggio: a web server for calculating and
+  visualising interatomic interactions in protein structures. \emph{Journal of
+  Molecular Biology} \textbf{2017}, \emph{429}, 365--371\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Bouysset and Fiorucci(2021)Bouysset, and Fiorucci]{bouysset2021prolif}
+Bouysset,~C.; Fiorucci,~S. ProLIF: a library to encode molecular interactions
+  as fingerprints. \emph{Journal of Cheminformatics} \textbf{2021}, \emph{13},
+  72\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Vangone \latin{et~al.}(2011)Vangone, Spinelli, Scarano, Cavallo, and
+  Oliva]{vangone2011cocomaps}
+Vangone,~A.; Spinelli,~R.; Scarano,~V.; Cavallo,~L.; Oliva,~R. COCOMAPS: a web
+  application to analyze and visualize contacts at the interface of
+  biomolecular complexes. \emph{Bioinformatics} \textbf{2011}, \emph{27},
+  2915--2916\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Chawla \latin{et~al.}(2025)Chawla, Kalra, Petta, Sharma, Shaikh,
+  Cavallo, and Oliva]{chawla2025cocomaps2}
+Chawla,~M.; Kalra,~U.; Petta,~A.; Sharma,~S.; Shaikh,~A.~R.; Cavallo,~L.;
+  Oliva,~R. COCOMAPS 2.0: a web server for identifying, analyzing, and
+  visualizing atomic interactions at the interface of biomolecular complexes.
+  \emph{Bioinformatics} \textbf{2025}, \emph{41}, btaf606\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Salentin and Schroeder(2026)Salentin, and Schroeder]{plipconfig}
+Salentin,~S.; Schroeder,~M. plip (source code repository): {\tt
+  plip/basic/config.py}. \url{https://github.com/pharmai/plip}, 2026; Accessed
+  September 2026\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax

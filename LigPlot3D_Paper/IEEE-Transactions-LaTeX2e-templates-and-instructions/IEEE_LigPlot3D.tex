@@ -57,27 +57,30 @@ Three-dimensional molecular visualization is performed using a hybrid WebGL-base
 A custom synchronization layer coordinates camera state, orientation, and selection events between the two rendering engines, allowing seamless transitions between global protein views and ligand-focused inspection while preserving spatial context.
 
 \subsection{Geometric Interaction Algorithms}
-LigPlot3D incorporates a deterministic, geometry-based interaction detection module intended for rapid, pose-centric analysis of protein--ligand complexes. Interaction classification is performed using explicit distance- and angle-based criteria derived from commonly adopted conventions in structural biology. All interaction calculations are executed client-side using atomic coordinates parsed directly from the loaded structure files.
+LigPlot3D incorporates a deterministic, geometry-based interaction detection module intended for rapid, pose-centric analysis of protein--ligand complexes. Interaction classification is performed using explicit distance- and angle-based criteria. Each criterion is adapted from a specific, previously published geometric convention for that interaction type, cited individually in the subsections below, rather than defined ad hoc for this work. All interaction calculations are executed client-side using atomic coordinates parsed directly from the loaded structure files.
 
 Geometric thresholds and atom classifications are defined centrally within the application configuration (\texttt{constants.ts}), ensuring transparency and reproducibility of interaction assignments. All active thresholds are documented within the application interface, allowing users to inspect the criteria underlying interaction detection.
 
 \subsubsection{Hydrogen Bonds}
-Hydrogen bonds are identified between potential donor and acceptor atoms restricted to nitrogen, oxygen, and sulfur. A hydrogen bond is assigned when the donor–acceptor heavy-atom separation is less than or equal to 3.5~\AA\ and the donor–hydrogen–acceptor angle is greater than or equal to $120^{\circ}$, enforcing geometric directionality. Fluorine atoms are explicitly excluded from the acceptor set due to their limited hydrogen-bonding capacity in biological environments.
+Hydrogen bonds are identified between potential donor and acceptor atoms restricted to nitrogen, oxygen, and sulfur, following the heavy-atom donor–acceptor convention established for protein structures that lack resolved hydrogens \cite{bakerhubbard1984hbond}. A hydrogen bond is assigned when the donor–acceptor heavy-atom separation is less than or equal to 3.5~\AA. When the donor's hydrogen position is resolvable from the loaded structure, LigPlot3D additionally enforces the donor–hydrogen–acceptor angle criterion of $120^{\circ}$ or greater established by McDonald and Thornton \cite{mcdonaldthornton1994hbond}. Because most crystallographic and docking-derived structures omit explicit hydrogens, this angle check is applied conditionally, and the heavy-atom distance criterion alone governs assignment otherwise. Fluorine atoms are explicitly excluded from the acceptor set due to their limited hydrogen-bonding capacity in biological environments.
 
 \subsubsection{Salt Bridges}
-Salt bridges are defined as electrostatic interactions between oppositely charged ionizable groups. Positively charged centers include nitrogen atoms in the side chains of arginine (NH1, NH2), lysine (NZ), and histidine (ND1, NE2), while negatively charged centers correspond to carboxylate oxygen atoms in aspartate (OD1, OD2) and glutamate (OE1, OE2). A salt bridge is assigned when the distance between charge centers is less than or equal to 4.0~\AA.
+Salt bridges are defined as electrostatic interactions between oppositely charged ionizable groups. Positively charged centers include nitrogen atoms in the side chains of arginine (NH1, NH2), lysine (NZ), and histidine (ND1, NE2), while negatively charged centers correspond to carboxylate oxygen atoms in aspartate (OD1, OD2) and glutamate (OE1, OE2). A salt bridge is assigned when the distance between charge centers is less than or equal to 4.0~\AA, adapted from the ion-pair distance convention reported by Barlow and Thornton \cite{barlowthornton1983saltbridge}.
 
 \subsubsection{Hydrophobic Contacts}
-Hydrophobic contacts are detected between non-polar carbon atoms, including both aliphatic and aromatic carbons. A distance cutoff of 4.5~\AA\ is applied to capture van der Waals contacts that contribute to hydrophobic stabilization within the binding site.
+Hydrophobic contacts are detected between non-polar carbon atoms, including both aliphatic and aromatic carbons. A distance cutoff of 4.5~\AA\ is applied to capture van der Waals contacts that contribute to hydrophobic stabilization within the binding site, consistent with the hydrophobic contact ranges discussed for ligand--protein recognition by Bissantz, Kuhn, and Stahl \cite{bissantz2010medchem}.
 
 \subsubsection{\texorpdfstring{$\pi$}{π}-Stacking Interactions}
-Aromatic interactions are evaluated for residues containing planar ring systems, including phenylalanine, tyrosine, tryptophan, and histidine. Ring centroids and plane normals are computed to classify interaction geometry. Interactions are assigned when the centroid–centroid distance is less than or equal to 5.5~\AA. Parallel stacking interactions require an inter-planar angle of $30^{\circ}$ or less with a lateral offset not exceeding 2.0~\AA, while T-shaped stacking interactions are identified by inter-planar angles greater than or equal to $60^{\circ}$.
+Aromatic interactions are evaluated for residues containing planar ring systems, including phenylalanine, tyrosine, tryptophan, and histidine. Ring centroids and plane normals are computed to classify interaction geometry, following the geometric classification of aromatic side-chain pairs reported by McGaughey, Gagn\'e, and Rapp\'e \cite{mcgaughey1998pistacking}. Interactions are assigned when the centroid–centroid distance is less than or equal to 5.5~\AA. Parallel stacking interactions require an inter-planar angle of $30^{\circ}$ or less with a lateral offset not exceeding 2.0~\AA, while T-shaped stacking interactions are identified by inter-planar angles greater than or equal to $60^{\circ}$. LigPlot3D also detects cation–$\pi$ contacts between these aromatic ring centroids and positively charged ligand or protein groups within 5.0~\AA, using the distance convention of Gallivan and Dougherty \cite{gallivandougherty1999cationpi}, and reports them under the $\pi$-stacking interaction class rather than as a separate category.
 
 \subsubsection{Halogen Bonds}
-Halogen bonds are identified between halogen donors (Cl, Br, I) and nucleophilic acceptors (N, O, S). An interaction is assigned when the halogen–acceptor separation is less than or equal to 3.5~\AA\ and the C–X$\cdots$acceptor angle is greater than or equal to $140^{\circ}$, consistent with sigma-hole directionality.
+Halogen bonds are identified between halogen donors (Cl, Br, I) and nucleophilic acceptors (N, O, S), following the directional geometric criteria for halogen bonding in biological molecules established by Auffinger and coworkers \cite{auffinger2004halogenbonds}. An interaction is assigned when the halogen–acceptor separation is less than or equal to 3.5~\AA\ and the C–X$\cdots$acceptor angle, measured from the ligand carbon covalently bonded to the halogen, is greater than or equal to $140^{\circ}$, consistent with sigma-hole directionality. Unlike the hydrogen-bond donor angle, this angle is always well-defined, because a halogen substituent is invariably bonded to exactly one heavy atom.
 
 \subsubsection{Metal Coordination}
-Metal coordination interactions are detected for common biologically relevant metals, including Zn, Fe, Mg, and Ca, interacting with electronegative atoms (N, O, S). A stringent distance threshold of 2.8~\AA\ is applied to identify coordination contacts. The current implementation relies exclusively on geometric criteria and does not incorporate energetic scoring or solvent models.
+Metal coordination interactions are detected for common biologically relevant metals, including Zn, Fe, Mg, and Ca, interacting with electronegative atoms (N, O, S). A stringent distance threshold of 2.8~\AA\ is applied to identify coordination contacts, within the range of metal–ligand coordination distances surveyed by Harding \cite{harding2001metalgeometry}. That survey shows optimal coordination distance varies by metal identity, so a single uniform cutoff across all supported metals is a simplification that trades per-metal precision for implementation simplicity. The current implementation relies exclusively on geometric criteria and does not incorporate energetic scoring or solvent models.
+
+\subsubsection{Applicability Beyond Protein Receptors}
+Hydrogen bond, halogen bond, hydrophobic contact, and metal coordination detection operate on generic element types rather than residue identity, so these interaction classes already apply to ligands bound to RNA or DNA receptors to a meaningful degree. Salt-bridge and receptor-side $\pi$-stacking detection remain restricted to the canonical amino-acid residue definitions in \texttt{constants.ts} and are not yet extended to nucleotide bases and backbone phosphate groups. Formalizing nucleic-acid-specific residue and ring definitions to bring these two interaction classes to parity is identified as a direct extension of this work.
 
 
 \section{Results and Discussion}
@@ -110,18 +113,71 @@ This deployment model lowers the barrier to entry for docking result inspection 
 \end{figure*}
 
 \subsection{Comparison with Existing Tools}
-To contextualize LigPlot3D within the landscape of interaction analysis and visualization tools, its functionality was compared with LigPlot+\cite{laskowski2011ligplot+} and the Protein--Ligand Interaction Profiler (PLIP)\cite{salentin2015plip,schake2025plip}.
+To contextualize LigPlot3D within the landscape of interaction analysis and visualization tools, its functionality was compared with LigPlot+\cite{laskowski2011ligplot+}, the Protein--Ligand Interaction Profiler (PLIP)\cite{salentin2015plip,schake2025plip}, Arpeggio\cite{jubb2017arpeggio}, ProLIF\cite{bouysset2021prolif}, and COCOMAPS\cite{vangone2011cocomaps,chawla2025cocomaps2}. Table~\ref{tab:comparison} summarizes deployment model and typical use case across these tools.
 
 LigPlot+ generates publication-quality two-dimensional interaction schematics by projecting three-dimensional complexes into flattened diagrams. These representations are effective for static reporting and comparative summaries but inherently sacrifice spatial depth information. LigPlot3D differs in that it preserves the full three-dimensional geometry of the binding site, enabling users to interrogate interaction orientations and steric relationships interactively within the browser.
 
-PLIP provides a comprehensive and well-validated interaction profiling framework, including advanced interaction classes such as water bridges and metal coordination, and supports both protein--ligand and protein--protein interfaces. However, PLIP primarily operates through server-based reports or command-line workflows that generate static outputs or external visualization scripts. LigPlot3D complements this functionality by offering an interactive, client-side environment focused on rapid docking pose inspection and immediate visual feedback, without requiring data upload or local software installation.
+PLIP provides a comprehensive and well-validated interaction profiling framework, including interaction classes not yet implemented in LigPlot3D such as water bridges, and supports both protein--ligand and protein--protein interfaces. However, PLIP primarily operates through server-based reports or command-line workflows that generate static outputs or external visualization scripts. LigPlot3D complements this functionality by offering an interactive, client-side environment focused on rapid docking pose inspection and immediate visual feedback, without requiring data upload or local software installation. Table~\ref{tab:thresholds} compares LigPlot3D's geometric thresholds against PLIP's default configuration in detail.
+
+Arpeggio calculates interatomic contacts directly from a structure file through an OpenBabel-based atom-typing pipeline, classifying a broad range of contact types, including ring interactions, hydrogen bonds, and steric clashes, through its web server and standalone library \cite{jubb2017arpeggio}. Its interaction taxonomy is more granular than LigPlot3D's, but Arpeggio is designed around single-structure, API-driven batch analysis rather than the pose-by-pose interactive comparison that LigPlot3D targets for docking triage.
+
+ProLIF encodes protein--ligand and protein--protein interactions as bit-vector fingerprints using RDKit, and is built specifically for scoring and comparing large ensembles of poses or molecular dynamics frames \cite{bouysset2021prolif}. This fingerprint representation is well suited to downstream machine learning and trajectory analysis, but ProLIF is used as a Python library within a scripting or notebook environment rather than as a standalone interactive viewer, so it does not provide LigPlot3D's direct visual inspection of a single pose.
+
+COCOMAPS analyzes and visualizes residue-level contacts at the interface of biomolecular complexes, historically emphasizing protein--protein and protein--nucleic acid interfaces over small-molecule ligands \cite{vangone2011cocomaps}. The recent COCOMAPS~2.0 release adds atomic-level interaction classification across sixteen contact types and interactive Mol* visualization \cite{chawla2025cocomaps2}, narrowing the visualization gap with LigPlot3D. COCOMAPS~2.0 remains a file-upload web-server workflow, however, so LigPlot3D differs by performing the equivalent client-side analysis locally, without transmitting structural data.
+
+\begin{table}[htbp]
+\centering
+\caption{Deployment model and typical use case across interaction analysis tools.}
+\label{tab:comparison}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lp{2.8cm}cp{5.5cm}}
+\hline
+\textbf{Tool} & \textbf{Deployment} & \textbf{Interactive} & \textbf{Primary use case} \\
+\hline
+LigPlot3D & Client-side web app & Yes & Interactive pose-by-pose docking triage \\
+LigPlot+ \cite{laskowski2011ligplot+} & Local desktop software & Limited & Publication-quality 2D interaction schematics \\
+PLIP \cite{salentin2015plip,schake2025plip} & Web server / CLI & No & Batch interaction profiling and reporting \\
+Arpeggio \cite{jubb2017arpeggio} & Web server / library & No & Granular, API-driven contact calculation \\
+ProLIF \cite{bouysset2021prolif} & Python library & No & Interaction fingerprints for MD and pose ensembles \\
+COCOMAPS 2.0 \cite{chawla2025cocomaps2} & Web server & Yes (Mol*) & Interface contact-map analysis of biomolecular complexes \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{LigPlot3D geometric thresholds compared with PLIP's default configuration \cite{plipconfig}. The two tools are independently parameterized and their thresholds are not intended to be identical.}
+\label{tab:thresholds}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcc}
+\hline
+\textbf{Interaction} & \textbf{LigPlot3D} & \textbf{PLIP (default)} \\
+\hline
+Hydrogen bond distance & $\leq 3.5$~\AA & $\leq 4.1$~\AA \\
+Hydrogen bond angle & $\geq 120^{\circ}$ (D–H–A)$^{a}$ & $\geq 100^{\circ}$ (donor angle) \\
+Salt bridge distance & $\leq 4.0$~\AA & $\leq 5.5$~\AA \\
+Hydrophobic contact distance & $\leq 4.5$~\AA & $\leq 4.0$~\AA \\
+$\pi$-stacking distance & $\leq 5.5$~\AA & $\leq 5.5$~\AA \\
+$\pi$-stacking angle deviation & $\leq 30^{\circ}$ (parallel) & $\leq 30^{\circ}$ \\
+Halogen bond distance & $\leq 3.5$~\AA & $\leq 4.0$~\AA \\
+Halogen bond angle & $\geq 140^{\circ}$ (C–X$\cdots$A) & $165^{\circ}\!\pm\!30^{\circ}$ (donor), $120^{\circ}$ (acceptor) \\
+Metal coordination distance & $\leq 2.8$~\AA & $\leq 3.0$~\AA \\
+\hline
+\end{tabular}%
+}
+
+\footnotesize $^{a}$Applied when the donor's hydrogen is resolvable from the loaded structure. Otherwise, LigPlot3D applies the heavy-atom distance criterion alone (see the Hydrogen Bonds subsection).
+\end{table}
+
+LigPlot3D, PLIP, Arpeggio, ProLIF, and COCOMAPS all classify interactions from geometric proxies rather than from computed interaction energies. Their outputs are therefore expected to agree closely on well-formed, unambiguous contacts, such as short and near-linear hydrogen bonds or face-to-face aromatic stacking, and to diverge most at marginal cases close to a distance or angle cutoff. Divergence at these margins reflects genuine differences in atom-typing granularity, in whether donor hydrogens are placed or inferred, and in the specific threshold values each tool applies (Table~\ref{tab:thresholds}), rather than an error in any single implementation. None of these geometric criteria substitute for an energetic or experimental determination of interaction strength. Confirming that a geometrically detected contact is functionally significant, as opposed to a fortuitous short contact, requires orthogonal evidence such as mutagenesis, isothermal titration calorimetry, or quantum-mechanical interaction energy calculations. A systematic, structure-matched benchmark of LigPlot3D against PLIP, Arpeggio, ProLIF, and COCOMAPS, together with comparison against such experimentally validated interaction sets, is identified as a direct extension of this work.
 
 \section{Conclusion}
 In this study, LigPlot3D is presented as a web-based application for interactive analysis of protein--ligand binding interfaces. LigPlot3D integrates browser-native three-dimensional molecular visualization with deterministic, geometry-based detection of key non-covalent interactions, enabling rapid qualitative assessment of docking poses and binding modes.
 
 By performing all parsing, visualization, and interaction analysis client-side, LigPlot3D eliminates the need for local software installation or remote server execution, while preserving data privacy. The application is designed to complement established interaction profilers and schematic visualization tools by emphasizing interactivity, accessibility, and immediate structural feedback within a lightweight workflow.
 
-LigPlot3D is particularly well suited for early-stage docking analysis, educational use, and rapid inspection of binding hypotheses where intuitive exploration of interaction geometry is essential. Future development will focus on extending supported interaction annotations, incorporating optional energy-related descriptors, and enabling analysis of time-resolved structural data such as molecular dynamics trajectories.
+LigPlot3D is particularly well suited for early-stage docking analysis, educational use, and rapid inspection of binding hypotheses where intuitive exploration of interaction geometry is essential. Future development will focus on extending supported interaction annotations, incorporating optional energy-related descriptors, formalizing support for RNA and DNA receptors, and enabling analysis of time-resolved structural data such as molecular dynamics trajectories.
 
 \section*{Data and Software Availability}
 LigPlot3D is open-source software released under the MIT License.
