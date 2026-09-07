@@ -10,8 +10,8 @@
   - Hydrogen Bonds (≤ 3.5 Å, angle ≥ 120°)
   - Salt Bridges (≤ 4.0 Å)
   - Hydrophobic Contacts (≤ 4.5 Å)
-  - Pi-Stacking (Parallel & T-shaped)
-  - Halogen Bonds & Metal Coordination
+  - Pi-Stacking (Parallel & T-shaped) and Cation-Pi Contacts
+  - Halogen Bonds
 - **Support for Multiple Formats**: PDB, CIF, SDF, MOL2.
 - **Export Data**: Download interaction lists as CSV or JSON.
 - **Customizable view**: Change representation styles (Cartoon, Stick, Ball & Stick) and colors.
@@ -20,7 +20,7 @@
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/LigPlot3D.git
+   git clone https://github.com/singhnitink/LigPlot3D.git
    cd LigPlot3D
    ```
 
