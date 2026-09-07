@@ -1,0 +1,25 @@
+%%{init: {'theme': 'neutral', 'themeVariables': { 'fontSize': '24px', 'fontFamily': 'system-ui, -apple-system, sans-serif' }}}%%
+flowchart TD
+    A["Structure Input\n(PDB / mmCIF)"] --> B["Client-Side Ingestion\n(FileReader API)"]
+    
+    B --> C1["WebGL Rendering Canvas\n(3Dmol.js Viewer)"]
+    B --> C2["Headless Parsing Stage\n(NGL Viewer API)"]
+    
+    C2 --> D["Ligand Identification\n(HETATM / Search)"]
+    D --> E["Spatial Pocket Filter\n(<18 Å Receptor Atoms)"]
+    
+    E --> F1["DFS Ring Detection\n(Bond Length < 1.65 Å)"]
+    E --> F2["Geometric Analysis\n(HB, SB, Halogen, Metal)"]
+    
+    F1 --> G["Deduplication Engine\n(Priority: SB > Pi > HB > HP)"]
+    F2 --> G
+    
+    G --> H1["3D Contact Overlay\n(Color-Coded Lines)"]
+    G --> H2["Tabular Summary\n(Interactive React UI)"]
+    
+    C1 --> H1
+
+    %% Node styling for high contrast
+    classDef default fill:#ffffff,stroke:#334155,stroke-width:2px;
+    classDef Highlight fill:#f8fafc,stroke:#0f172a,stroke-width:2.5px;
+    class G Highlight;

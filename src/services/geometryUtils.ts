@@ -49,6 +49,17 @@ export const cross = (a: Vector3, b: Vector3): Vector3 => ({
 
 export const mag = (v: Vector3): number => Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 
+export const scale = (v: Vector3, s: number): Vector3 => ({ x: v.x * s, y: v.y * s, z: v.z * s });
+
+// Lateral (in-plane) offset between two ring centroids, measured by projecting
+// the centre-to-centre vector onto the ring plane whose normal is `normal`.
+// Evaluated against both rings' normals by the caller, taking the minimum.
+export const lateralOffset = (centerA: Point3D, centerB: Point3D, normal: Vector3): number => {
+  const d = sub(centerB, centerA);
+  const n = normalize(normal);
+  return mag(sub(d, scale(n, dot(d, n))));
+};
+
 export const normalize = (v: Vector3): Vector3 => {
   const m = mag(v);
   if (m === 0) return { x: 0, y: 0, z: 0 };

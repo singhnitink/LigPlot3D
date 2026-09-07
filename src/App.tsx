@@ -95,11 +95,15 @@ const App: React.FC = () => {
   // Load demo structure for visitors without their own files
   const loadDemoFile = async () => {
     try {
-      const response = await fetch('/LigPlot3D/demo.cif');
+      // PDB 1R9Q: ProX periplasmic binding protein from E. coli in complex with
+      // proline betaine. Chosen because its quaternary ammonium is bound by an
+      // aromatic cage (Trp65/Trp140/Trp188/Tyr46), so the demo exercises cation-pi,
+      // salt-bridge and hydrogen-bond detection together.
+      const response = await fetch('/LigPlot3D/1R9Q.pdb');
       if (!response.ok) throw new Error('Failed to fetch demo file');
       const text = await response.text();
       const blob = new Blob([text], { type: 'text/plain' });
-      const demoFile = new File([blob], 'demo.cif', { type: 'text/plain' });
+      const demoFile = new File([blob], '1R9Q.pdb', { type: 'text/plain' });
       setFile(demoFile);
       setStructure(null);
       setLigandCandidates([]);

@@ -64,7 +64,9 @@ const HelpPage: React.FC<Props> = ({ onBack }) => {
                                         </td>
                                         <td className="px-4 py-3 font-mono text-slate-600">≤ 3.5 Å</td>
                                         <td className="px-4 py-3 text-slate-600">
-                                            Between donor (N, O, S) and acceptor atoms. Donor–H–Acceptor angle ≥ 120°.
+                                            Between donor (N, O, S) and acceptor atoms. Donor–H–Acceptor angle ≥ 120°,
+                                            applied when the donor's hydrogen is present in the structure; otherwise the
+                                            heavy-atom distance alone is used.
                                         </td>
                                     </tr>
                                     <tr>
@@ -82,7 +84,7 @@ const HelpPage: React.FC<Props> = ({ onBack }) => {
                                         </td>
                                         <td className="px-4 py-3 font-mono text-slate-600">≤ 4.5 Å</td>
                                         <td className="px-4 py-3 text-slate-600">
-                                            Nonpolar carbon–carbon contacts (aliphatic or aromatic).
+                                            Carbon–carbon contacts (aliphatic or aromatic).
                                         </td>
                                     </tr>
                                     <tr>
@@ -91,7 +93,18 @@ const HelpPage: React.FC<Props> = ({ onBack }) => {
                                         </td>
                                         <td className="px-4 py-3 font-mono text-slate-600">≤ 5.5 Å</td>
                                         <td className="px-4 py-3 text-slate-600">
-                                            Centroid–centroid distance. Parallel: angle &lt; 30°. T-shaped: angle 60–120°.
+                                            Centroid–centroid distance. Parallel: angle &lt; 30° with lateral offset ≤ 2.0 Å.
+                                            T-shaped: angle ≥ 60°.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td className="px-4 py-3">
+                                            <span className="px-2 py-1 bg-green-50 text-green-700 rounded text-xs font-medium">Cation–π</span>
+                                        </td>
+                                        <td className="px-4 py-3 font-mono text-slate-600">≤ 6.0 Å</td>
+                                        <td className="px-4 py-3 text-slate-600">
+                                            Aromatic ring centroid to a positively charged centre. Reported within the
+                                            Pi-Stacking category rather than as a separate interaction type.
                                         </td>
                                     </tr>
                                     <tr>
@@ -100,7 +113,7 @@ const HelpPage: React.FC<Props> = ({ onBack }) => {
                                         </td>
                                         <td className="px-4 py-3 font-mono text-slate-600">≤ 3.5 Å</td>
                                         <td className="px-4 py-3 text-slate-600">
-                                            Between halogen (Cl, Br, I) on ligand and acceptor (N, O, S). C–X···A angle ≥ 140°.
+                                            Between halogen (Cl, Br, I) on ligand and acceptor (N, O, S). C–X···A angle 165° ± 30°.
                                         </td>
                                     </tr>
                                     <tr>
@@ -109,7 +122,8 @@ const HelpPage: React.FC<Props> = ({ onBack }) => {
                                         </td>
                                         <td className="px-4 py-3 font-mono text-slate-600">≤ 2.8 Å</td>
                                         <td className="px-4 py-3 text-slate-600">
-                                            Involving metal ions (Zn, Mg, Fe, Cu, Ca, Na, K, Mn, Co, Ni). Distance varies by metal type.
+                                            Between a metal ion (Zn, Mg, Fe, Cu, Ca, Na, K, Mn, Co, Ni) and an electronegative
+                                            partner (N, O, S). Optimal distance varies by metal type.
                                         </td>
                                     </tr>
                                 </tbody>
