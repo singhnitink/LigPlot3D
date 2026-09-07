@@ -1,0 +1,52 @@
+\documentclass[11pt]{letter}
+\usepackage[top=0.9in,bottom=0.9in,left=1in,right=1in]{geometry}
+\usepackage{url}
+
+% The letter class uses a generous \parskip and reserves 6\medskipamount above
+% the signature. Both are trimmed so the letter fits on a single page.
+\setlength{\parskip}{0.55\baselineskip}
+\makeatletter
+\renewcommand{\closing}[1]{\par\nobreak\vspace{\parskip}%
+  \stopbreaks
+  \noindent
+  \ifx\@empty\fromaddress\else
+  \hspace*{\longindentation}\fi
+  \parbox{\indentedwidth}{\raggedright
+       \ignorespaces #1\\[2\medskipamount]%
+       \ifx\@empty\fromsig
+           \fromname
+       \else \fromsig \fi\strut}%
+   \par}
+\makeatother
+
+\signature{Nitin Kumar Singh\\
+Discipline of Chemical Engineering\\
+Indian Institute of Technology (IIT) Gandhinagar\\
+Palaj, Gujarat 382355, India\\
+singh\_nitin@iitgn.ac.in}
+
+\date{\today}
+
+\begin{document}
+
+\begin{letter}{Editor-in-Chief\\
+Journal of Molecular Graphics and Modelling}
+
+\opening{Dear Editor,}
+
+I am writing to submit a manuscript titled \textbf{``LigPlot3D: An Interactive Web-Based Framework for Geometric Analysis of Protein-Ligand Interactions''} for consideration in the \textit{Journal of Molecular Graphics and Modelling}.
+
+Molecular docking is central to structure-based drug discovery, yet inspecting and comparing binding poses across multiple ligands remains a practical bottleneck. Established interaction profilers are built primarily for batch analysis, schematic diagram generators produce static two-dimensional output, and both typically require either local installation or the upload of coordinates to a remote server. This leaves a gap for researchers needing immediate interactive feedback, particularly when working with proprietary compounds that cannot be sent to third-party services.
+
+LigPlot3D addresses this gap. It is a browser-based application in which structure parsing, interaction detection, and three-dimensional rendering all execute on the client, so no structural data leaves the user's machine and no installation is required. It detects hydrogen bonds, salt bridges, hydrophobic contacts, $\pi$-stacking and cation--$\pi$ contacts, and halogen bonds, presenting them simultaneously as an interactive three-dimensional scene and an exportable interaction table.
+
+Two aspects may particularly interest your readership. First, every geometric criterion derives from a published convention for that interaction type, with all thresholds defined centrally and documented in the interface, making assignments transparent and reproducible rather than implicit. Second, the manuscript reports an explicit quantitative comparison of these thresholds against the default configuration of a widely used interaction profiler, and discusses why borderline contacts may legitimately differ between geometric implementations. The detection module is evaluated on a complex with independently characterized binding determinants, where LigPlot3D recovers the aromatic cage coordinating the ligand together with the associated salt bridge and hydrogen bonds.
+
+This work falls within the scope of the journal, which covers the use of computers in investigating molecular structure, interaction, and design: it combines molecular graphics with a reproducible geometric treatment of protein--ligand interactions, in a form accessible without specialized infrastructure. LigPlot3D is freely available at \url{https://singhnitink.github.io/LigPlot3D/}, with source code openly released for local use.
+
+The manuscript has not been published elsewhere and is not under consideration by any other journal, and there are no conflicts of interest to declare. Thank you for considering this submission.
+
+\closing{Sincerely,}
+
+\end{letter}
+\end{document}
