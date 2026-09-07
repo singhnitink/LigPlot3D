@@ -17,6 +17,8 @@ export interface VisualSettings {
   pocketStyle: 'licorice' | 'ball+stick' | 'stick';
   interactionWidth: number;
   ligandColor: string;
+  /** Opacity of the context protein, 0 (invisible) to 1 (solid). */
+  proteinOpacity: number;
 }
 
 const App: React.FC = () => {
@@ -46,7 +48,8 @@ const App: React.FC = () => {
     ligandStyle: 'ball+stick',
     pocketStyle: 'stick',
     interactionWidth: 2.0,
-    ligandColor: '#22c55e'
+    ligandColor: '#22c55e',
+    proteinOpacity: 0.35
   });
 
   const [recenterTrigger, setRecenterTrigger] = useState(0);
@@ -330,6 +333,43 @@ const App: React.FC = () => {
                         <option value="ball+stick">Ball & Stick</option>
                       </select>
                     </div>
+                  </div>
+
+                  <div className={visualSettings.proteinStyle === 'hidden' ? 'opacity-40 pointer-events-none' : ''}>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-[10px] font-bold text-slate-500">Protein Opacity</label>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setVisualSettings({ ...visualSettings, proteinOpacity: 0.15 })}
+                          className="px-1.5 py-0.5 text-[10px] border border-slate-300 rounded hover:bg-slate-100 text-slate-600"
+                          title="Faint context protein"
+                        >
+                          Faint
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setVisualSettings({ ...visualSettings, proteinOpacity: 1 })}
+                          className="px-1.5 py-0.5 text-[10px] border border-slate-300 rounded hover:bg-slate-100 text-slate-600"
+                          title="Fully opaque protein"
+                        >
+                          Solid
+                        </button>
+                        <span className="text-[10px] text-slate-500 w-8 text-right tabular-nums">
+                          {Math.round(visualSettings.proteinOpacity * 100)}%
+                        </span>
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="100"
+                      step="5"
+                      value={Math.round(visualSettings.proteinOpacity * 100)}
+                      onChange={e => setVisualSettings({ ...visualSettings, proteinOpacity: parseInt(e.target.value) / 100 })}
+                      className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+                      disabled={visualSettings.proteinStyle === 'hidden'}
+                    />
                   </div>
 
                   <div>

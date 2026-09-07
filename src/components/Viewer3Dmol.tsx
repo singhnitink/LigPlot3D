@@ -119,22 +119,27 @@ const Viewer3Dmol: React.FC<Props> = ({
         if (visualSettings.proteinStyle !== 'hidden') {
             let styleObj: any = {};
             const color = '#cccccc';
+            // User-controlled context opacity. Clamped because 3Dmol treats values
+            // outside 0-1 as opaque, which would silently ignore the setting.
+            const opacity = Math.min(1, Math.max(0, visualSettings.proteinOpacity ?? 0.35));
 
             switch (visualSettings.proteinStyle) {
                 case 'cartoon':
-                    styleObj = { cartoon: { color: color, opacity: 0.15 } };
+                    styleObj = { cartoon: { color: color, opacity: opacity } };
                     break;
                 case 'rope': // Tube in 3Dmol
-                    styleObj = { cartoon: { color: color, style: 'trace', radius: 0.3 } }; // approximate
+                    styleObj = { cartoon: { color: color, style: 'trace', radius: 0.3, opacity: opacity } }; // approximate
                     break;
                 case 'trace':
-                    styleObj = { stick: { radius: 0.2, color: color } }; // approximate backbone
+                    styleObj = { stick: { radius: 0.2, color: color, opacity: opacity } }; // approximate backbone
                     break;
                 case 'line':
-                    styleObj = { line: { color: color } };
+                    // 3Dmol's line style has no opacity parameter; hide the protein
+                    // entirely at zero rather than leaving it stuck fully visible.
+                    styleObj = opacity === 0 ? {} : { line: { color: color } };
                     break;
                 default:
-                    styleObj = { cartoon: { color: color } };
+                    styleObj = { cartoon: { color: color, opacity: opacity } };
             }
 
             // Apply to everything NOT ligand
