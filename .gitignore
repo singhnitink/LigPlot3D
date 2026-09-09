@@ -1,27 +1,64 @@
-# Logs
-logs
-*.log
+# =============================================
+#  Node / Vite / JS tooling
+# =============================================
+node_modules/
+dist/
+dist-ssr/
+*.local
+package-lock.json
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# =============================================
+#  LaTeX build artifacts  (keep .tex, .bib, .bbl, Figures/, Makefile)
+# =============================================
+LigPlot3D_Paper/*.aux
+LigPlot3D_Paper/*.log
+LigPlot3D_Paper/*.out
+LigPlot3D_Paper/*.fls
+LigPlot3D_Paper/*.fdb_latexmk
+LigPlot3D_Paper/*.synctex.gz
+LigPlot3D_Paper/*.blg
 
-# Editor directories and files
+# =============================================
+#  Large binary / structure files
+# =============================================
+*.pdb
+*.cif
+*.odg
+*.png
+*.pdf
+
+# =============================================
+#  Local scratch / benchmark / utility dirs
+# =============================================
+bench.local/
+misc/
+my-dock-analyzer/
+watermarks-remover-main/
+mark_remover.sh
+testfile
+USING_GITHUB.dat
+metadata.json
+
+# =============================================
+#  OS & editor junk
+# =============================================
+.DS_Store
+Thumbs.db
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-misc
-watermarks-remover-main
-mark_remover.sh
+
+# =============================================
+#  Claude / AI config (local only)
+# =============================================
+.claude/

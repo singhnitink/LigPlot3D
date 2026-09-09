@@ -1,0 +1,46 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+
+\definecolor{primary}{RGB}{16, 52, 102}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primary,
+    urlcolor=primary,
+    citecolor=primary
+}
+
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+    {\LARGE \textbf{\color{primary} Highlights}}\\[1.2em]
+    {\large \textbf{LigPlot3D: An Interactive Web-Based Framework for Geometric Analysis of Protein--Ligand Interactions}}\\[0.8em]
+    {\small Nitin Kumar Singh}\\[0.3em]
+    \rule{\linewidth}{0.8pt}
+\end{center}
+
+\vspace{0.8em}
+
+\begin{itemize}[leftmargin=1.5em, itemsep=1.2em]
+    \item \textbf{Browser-native, client-side execution:} Structure parsing, geometric analysis, and 3D rendering are executed entirely within the web browser without requiring local software installation or server-side dependencies.
+
+    \item \textbf{Strict data privacy for proprietary compounds:} Complete client-side calculation guarantees that confidential structural coordinates never leave the user's local machine.
+
+    \item \textbf{Comprehensive non-covalent interaction detection:} Accurately identifies hydrogen bonds, salt bridges, hydrophobic contacts, $\pi$--$\pi$ stacking, cation--$\pi$ contacts, and halogen bonds.
+
+    \item \textbf{Transparent, literature-derived geometric criteria:} Interaction detection relies on explicit, reproducible distance and angular thresholds adapted from established structural conventions.
+
+    \item \textbf{Dual synchronized 3D visualization and tabular summaries:} Combines high-performance WebGL rendering (via NGL Viewer and 3Dmol.js) with structured, exportable interaction tables for rapid post-docking pose assessment.
+
+    \item \textbf{Validation on benchmark protein--ligand complexes:} Successfully recovers experimentally characterized binding determinants, such as aromatic cage coordination and salt-bridge networks.
+
+    \item \textbf{Freely accessible and open-source:} Hosted on GitHub Pages (\url{https://singhnitink.github.io/LigPlot3D/}) with MIT-licensed source code available for offline deployment and customized workflows.
+\end{itemize}
+
+\end{document}
