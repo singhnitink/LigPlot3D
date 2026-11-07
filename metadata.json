@@ -1,5 +1,5 @@
 {
-  "name": "DockAnalyzer",
-  "description": "A fully client-side protein-ligand interaction analyzer and visualizer. Upload PDB structures to calculate H-bonds, hydrophobic contacts, and salt bridges instantly in the browser.",
+  "name": "LigPlot3D",
+  "description": "A fully client-side protein-ligand interaction analyzer and visualizer. Upload a structure to detect H-bonds, salt bridges, \u03c0 interactions, halogen bonds, metal coordination and hydrophobic contacts in the browser.",
   "requestFramePermissions": []
 }

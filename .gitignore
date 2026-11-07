@@ -5,7 +5,7 @@ node_modules/
 dist/
 dist-ssr/
 *.local
-package-lock.json
+# package-lock.json is committed on purpose: it pins the exact build (npm ci, CI).
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -27,6 +27,9 @@ LigPlot3D_Paper/*.blg
 #  Large binary / structure files
 # =============================================
 *.pdb
+# ...except the demo structure the site serves, and test fixtures
+!public/1R9Q.pdb
+!tests/fixtures/*.pdb
 *.cif
 *.odg
 *.png
@@ -62,3 +65,7 @@ Thumbs.db
 #  Claude / AI config (local only)
 # =============================================
 .claude/
+# =============================================
+#  Local audit notes (never commit)
+# =============================================
+BUG_AUDIT.md

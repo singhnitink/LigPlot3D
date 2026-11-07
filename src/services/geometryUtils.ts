@@ -88,14 +88,28 @@ export const angleBetween = (v1: Vector3, v2: Vector3): number => {
     return (Math.acos(cosTheta) * 180) / Math.PI;
 };
 
-// Best fit plane normal for a set of points (simple cross product of first 3 distinct points approximation)
-// For 5/6 membered rings, this is usually sufficient if planar.
-export const getPlaneNormal = (atoms: Point3D[]): Vector3 => {
-  if (atoms.length < 3) return { x: 0, y: 0, z: 1 };
-  const p1 = atoms[0];
-  const p2 = atoms[Math.floor(atoms.length / 2)];
-  const p3 = atoms[atoms.length - 1];
-  const v1 = sub(p2, p1);
-  const v2 = sub(p3, p1);
-  return normalize(cross(v1, v2));
+// Best-fit plane of a ring whose atoms are given IN RING ORDER (Newell's method).
+// Uses every atom, unlike a 3-point cross product, so it is robust to slightly
+// non-planar rings and never returns a zero normal for a real ring.
+// maxDeviation is the largest out-of-plane distance of any atom (planarity test).
+export const ringPlane = (ring: Point3D[]): { center: Point3D; normal: Vector3; maxDeviation: number } => {
+  const center = getCenter(ring);
+  let nx = 0, ny = 0, nz = 0;
+  for (let i = 0; i < ring.length; i++) {
+    const c = ring[i];
+    const n = ring[(i + 1) % ring.length];
+    nx += (c.y - n.y) * (c.z + n.z);
+    ny += (c.z - n.z) * (c.x + n.x);
+    nz += (c.x - n.x) * (c.y + n.y);
+  }
+  let normal = normalize({ x: nx, y: ny, z: nz });
+  if (mag(normal) === 0) normal = { x: 0, y: 0, z: 1 };
+  let maxDeviation = 0;
+  for (const p of ring) {
+    maxDeviation = Math.max(maxDeviation, Math.abs(dot(sub(p, center), normal)));
+  }
+  return { center, normal, maxDeviation };
 };
+
+/** @deprecated use ringPlane(); kept for local benchmark scripts. */
+export const getPlaneNormal = (atoms: Point3D[]): Vector3 => ringPlane(atoms).normal;

@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="LigPlot3D: browser-based 3D visualisation and analysis of protein–ligand interactions. Structure files never leave your computer." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>LigPlot3D</title>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-6MYDQ2M72C"></script>
@@ -12,10 +14,9 @@
       gtag('js', new Date());
       gtag('config', 'G-6MYDQ2M72C');
     </script>
-    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body class="min-h-screen w-screen bg-slate-100" style="margin: 0; padding: 0;">
-    <div id="root" style="width: 100%; max-width: 100%;"></div>
+  <body class="h-full w-full bg-slate-100 m-0 p-0">
+    <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

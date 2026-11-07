@@ -1,112 +1,162 @@
 
 import React, { useMemo } from 'react';
 import type { Interaction } from '../types';
-import { InteractionType } from '../types';
 import { Download, FileJson } from 'lucide-react';
+import { INTERACTION_ORDER, INTERACTION_STYLES } from '../interactionStyles';
+
+export type TableState = 'no-file' | 'loading' | 'error' | 'no-ligand' | 'ready';
 
 interface Props {
   interactions: Interaction[];
+  /** All interactions found for the ligand, before filtering. */
+  totalCount: number;
+  state: TableState;
+  /** e.g. "1R9Q" — used in export file names and the CSV. */
+  fileName: string;
+  /** e.g. "PBE 1001 (A)" */
+  ligandLabel: string;
+  onShowAll: () => void;
 }
 
-const InteractionTable: React.FC<Props> = ({ interactions }) => {
+const residueText = (a: Interaction['proteinAtom']) => `${a.resName} ${a.resNo}${a.insCode}`;
+const ligandText = (i: Interaction) => i.ligandLabel ?? i.ligandAtom.name;
+const partnerAtomText = (i: Interaction) => i.proteinLabel ?? i.proteinAtom.name;
 
-  const downloadCSV = () => {
-    const headers = ['ID', 'Type', 'Distance (Å)', 'Ligand Atom', 'Protein Atom', 'Residue'];
-    const rows = interactions.map(i => [
-      i.id,
-      i.type,
-      i.distance.toFixed(2),
-      `${i.ligandAtom.element}:${i.ligandAtom.name}`,
-      `${i.proteinAtom.element}:${i.proteinAtom.name}`,
-      `${i.proteinAtom.resName} ${i.proteinAtom.resNo}`
-    ]);
+/** RFC 4180 field quoting. */
+const csvField = (v: string | number | undefined) => {
+  const s = v === undefined ? '' : String(v);
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
 
-    const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'interactions.csv');
-    link.click();
-  };
+const download = (content: BlobPart, type: string, name: string) => {
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = name;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
 
-  const downloadJSON = () => {
-    const blob = new Blob([JSON.stringify(interactions, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'interactions.json');
-    link.click();
-  };
+const safe = (s: string) => s.replace(/[^A-Za-z0-9._-]+/g, '_').replace(/^_+|_+$/g, '');
+
+const InteractionTable: React.FC<Props> = ({ interactions, totalCount, state, fileName, ligandLabel, onShowAll }) => {
 
   const sortedInteractions = useMemo(() => {
     return [...interactions].sort((a, b) => {
-      if (a.type !== b.type) return a.type.localeCompare(b.type);
+      if (a.type !== b.type) return INTERACTION_ORDER.indexOf(a.type) - INTERACTION_ORDER.indexOf(b.type);
       return a.distance - b.distance;
     });
   }, [interactions]);
 
-  if (interactions.length === 0) {
+  const exportBase = `${safe(fileName) || 'structure'}_${safe(ligandLabel) || 'ligand'}_interactions`;
+
+  const downloadCSV = () => {
+    const headers = [
+      'File', 'Ligand', 'ID', 'Type', 'Subtype', 'Distance (Å)', 'Angle (°)',
+      'Ligand Residue', 'Ligand Chain', 'Ligand Atom(s)', 'Ligand Element',
+      'Partner Residue', 'Partner Chain', 'Partner Atom(s)', 'Partner Element',
+    ];
+    const rows = sortedInteractions.map(i => [
+      fileName, ligandLabel, i.id, i.type, i.subtype ?? '', i.distance.toFixed(2),
+      i.angle !== undefined ? i.angle.toFixed(1) : '',
+      residueText(i.ligandAtom), i.ligandAtom.chain, ligandText(i), i.ligandLabel ? '' : i.ligandAtom.element,
+      residueText(i.proteinAtom), i.proteinAtom.chain, partnerAtomText(i), i.proteinLabel ? '' : i.proteinAtom.element,
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(csvField).join(',')).join('\r\n');
+    // BOM so spreadsheet software reads the Å / ° symbols as UTF-8.
+    download('﻿' + csv, 'text/csv;charset=utf-8', `${exportBase}.csv`);
+  };
+
+  const downloadJSON = () => {
+    download(JSON.stringify(sortedInteractions, null, 2), 'application/json', `${exportBase}.json`);
+  };
+
+  if (state !== 'ready' || interactions.length === 0) {
+    let message: React.ReactNode;
+    switch (state) {
+      case 'no-file': message = 'Upload a structure or try the demo to see interactions.'; break;
+      case 'loading': message = 'Analysing structure…'; break;
+      case 'error': message = 'The structure could not be analysed. See the message above the viewer.'; break;
+      case 'no-ligand': message = 'No ligand selected. Choose one in the sidebar or search by residue name.'; break;
+      default:
+        message = totalCount === 0
+          ? 'No interactions detected for this ligand.'
+          : (
+            <span>
+              All {totalCount} interactions are hidden by the current filters.{' '}
+              <button type="button" onClick={onShowAll} className="font-medium text-indigo-600 underline hover:text-indigo-800">Show all</button>
+            </span>
+          );
+    }
     return (
-      <div className="h-full flex items-center justify-center text-slate-400">
-        <p>No interaction data available.</p>
+      <div className="h-full flex items-center justify-center text-slate-500 text-sm px-4 text-center" role="status">
+        <p>{message}</p>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col h-full">
-      {/* Toolbar with export buttons - responsive layout */}
-      <div className="px-3 md:px-4 py-2 bg-white border-b border-slate-100 flex flex-wrap justify-end gap-2">
-        <button onClick={downloadCSV} className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 text-slate-700">
-          <Download size={12} /> <span className="hidden sm:inline">Export</span> CSV
-        </button>
-        <button onClick={downloadJSON} className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 text-slate-700">
-          <FileJson size={12} /> <span className="hidden sm:inline">Export</span> JSON
-        </button>
+      {/* Toolbar with export buttons */}
+      <div className="px-3 md:px-4 py-2 bg-white border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs text-slate-500">
+          {interactions.length === totalCount ? `${totalCount} interactions` : `${interactions.length} of ${totalCount} interactions shown`}
+        </p>
+        <div className="flex gap-2">
+          <button type="button" onClick={downloadCSV} className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 text-slate-700">
+            <Download size={12} aria-hidden="true" /> <span className="hidden sm:inline">Export</span> CSV
+          </button>
+          <button type="button" onClick={downloadJSON} className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 text-slate-700">
+            <FileJson size={12} aria-hidden="true" /> <span className="hidden sm:inline">Export</span> JSON
+          </button>
+        </div>
       </div>
 
       {/* Scrollable table container - horizontal scroll on mobile */}
       <div className="overflow-auto flex-1 bg-white">
-        <table className="w-full text-xs md:text-sm text-left text-slate-600 min-w-[480px]">
-          <thead className="text-[10px] md:text-xs text-slate-700 uppercase bg-slate-50 sticky top-0 z-10 shadow-sm">
+        <table className="w-full text-xs md:text-sm text-left text-slate-600 min-w-[520px]">
+          <thead className="text-[11px] md:text-xs text-slate-700 uppercase bg-slate-50 sticky top-0 z-10 shadow-sm">
             <tr>
-              <th className="px-2 md:px-4 py-2 border-b">Type</th>
-              <th className="px-2 md:px-4 py-2 border-b">Dist</th>
-              <th className="px-2 md:px-4 py-2 border-b">Ligand</th>
-              <th className="px-2 md:px-4 py-2 border-b">Protein Res</th>
-              <th className="px-2 md:px-4 py-2 border-b hidden sm:table-cell">Protein Atom</th>
+              <th scope="col" className="px-2 md:px-4 py-2 border-b">Type</th>
+              <th scope="col" className="px-2 md:px-4 py-2 border-b">Dist (Å)</th>
+              <th scope="col" className="px-2 md:px-4 py-2 border-b">Ligand</th>
+              <th scope="col" className="px-2 md:px-4 py-2 border-b">Partner</th>
+              <th scope="col" className="px-2 md:px-4 py-2 border-b hidden sm:table-cell">Partner Atom</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {sortedInteractions.map((interaction) => {
-              let badgeColor = 'bg-slate-100 text-slate-800';
-              if (interaction.type === InteractionType.HydrogenBond) badgeColor = 'bg-blue-50 text-blue-700 border border-blue-100';
-              if (interaction.type === InteractionType.Hydrophobic) badgeColor = 'bg-orange-50 text-orange-700 border border-orange-100';
-              if (interaction.type === InteractionType.SaltBridge) badgeColor = 'bg-yellow-50 text-yellow-700 border border-yellow-100';
-              if (interaction.type === InteractionType.HalogenBond) badgeColor = 'bg-purple-50 text-purple-700 border border-purple-100';
-
-              // Shorten type names for mobile
-              const shortType = interaction.type.replace('Hydrogen Bond', 'H-Bond').replace('Hydrophobic', 'Hydro').replace('Salt Bridge', 'Salt');
-
+              const style = INTERACTION_STYLES[interaction.type];
               return (
                 <tr key={interaction.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-2 md:px-4 py-2">
-                    <span className={`px-1.5 md:px-2 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-wide whitespace-nowrap ${badgeColor}`}>
+                    <span className={`px-1.5 md:px-2 py-0.5 rounded border text-[10px] font-bold uppercase tracking-wide whitespace-nowrap ${style.badge}`}>
                       <span className="hidden md:inline">{interaction.type}</span>
-                      <span className="md:hidden">{shortType}</span>
+                      <span className="md:hidden">{style.short}</span>
                     </span>
+                    {interaction.subtype && (
+                      <span className="ml-1.5 text-[11px] text-slate-500 whitespace-nowrap">{interaction.subtype}</span>
+                    )}
                   </td>
-                  <td className="px-2 md:px-4 py-2 font-mono text-slate-900 font-medium">{interaction.distance.toFixed(2)}</td>
+                  <td className="px-2 md:px-4 py-2 font-mono text-slate-900 font-medium">
+                    {interaction.distance.toFixed(2)}
+                    {interaction.angle !== undefined && (
+                      <span className="hidden md:inline text-slate-400 text-xs font-sans"> · {interaction.angle.toFixed(0)}°</span>
+                    )}
+                  </td>
                   <td className="px-2 md:px-4 py-2 text-slate-600">
-                    {interaction.ligandAtom.name}
-                    <span className="hidden md:inline text-slate-400 text-xs"> ({interaction.ligandAtom.element})</span>
+                    {ligandText(interaction)}
+                    {!interaction.ligandLabel && (
+                      <span className="hidden md:inline text-slate-400 text-xs"> ({interaction.ligandAtom.element})</span>
+                    )}
                   </td>
-                  <td className="px-2 md:px-4 py-2 font-medium text-slate-800">
-                    {interaction.proteinAtom.resName} {interaction.proteinAtom.resNo}
-                    <span className="text-slate-400 font-normal hidden sm:inline"> ({interaction.proteinAtom.chain})</span>
+                  <td className="px-2 md:px-4 py-2 font-medium text-slate-800 whitespace-nowrap">
+                    {residueText(interaction.proteinAtom)}
+                    <span className="text-slate-400 font-normal"> ({interaction.proteinAtom.chain || '–'})</span>
                   </td>
-                  <td className="px-2 md:px-4 py-2 text-slate-600 hidden sm:table-cell">{interaction.proteinAtom.name}</td>
+                  <td className="px-2 md:px-4 py-2 text-slate-600 hidden sm:table-cell">{partnerAtomText(interaction)}</td>
                 </tr>
               );
             })}

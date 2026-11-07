@@ -6,7 +6,8 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // Local scratch folders are git-ignored and not part of the app.
+  globalIgnores(['dist', 'bench.local', 'misc', 'my-dock-analyzer', 'watermarks-remover-main', 'LigPlot3D_Paper']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
