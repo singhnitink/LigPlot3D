@@ -3,10 +3,11 @@ import * as NGL from 'ngl';
 import { InteractionType } from '../types';
 import {
   THRESHOLDS, ATOM_PROPS, COVALENT_RADII, GENERIC_LIGAND_NAMES, COFACTOR_GLYCAN_LIPID, ADDITIVES,
-  IGNORED_RESIDUES, MODIFIED_RESIDUES, CATIONIC_HIS, NEUTRAL_HIS, aromaticResName,
+  IGNORED_RESIDUES, MODIFIED_RESIDUES, CHARMM_ION_ELEMENTS, HYDROGEN_ELEMENTS, HALIDE_ELEMENTS,
+  aromaticResName, canonicalResidue, isPolymerResidueName,
 } from '../constants';
 import { distance, getCenter, ringPlane, angleBetween, angleDeg, lateralOffset } from './geometryUtils';
-import type { AtomData, Interaction, ResidueOption, AnalysisResult, Point3D } from '../types';
+import type { AtomData, Interaction, ResidueOption, AnalysisResult, Point3D, LigandUnit } from '../types';
 
 /** NGL does not export its AtomProxy class at the top level; derive the type instead. */
 type AtomProxy = Parameters<Parameters<NGL.Structure['eachAtom']>[0]>[0];
@@ -43,10 +44,24 @@ const isPrimaryAltloc = (ap: AtomProxy): boolean => {
   return !alt || alt === 'A' || alt === ' ' || alt === '.' || alt === '?';
 };
 
+/**
+ * Element of an atom, robust to force-field files:
+ *  - hydrogen isotopes (D, T) are reported as 'H' — chemistry is identical;
+ *  - CHARMM ions (atom name == residue name, e.g. SOD/SOD) get their real element even when
+ *    the element column is blank (NGL would otherwise guess SOD -> S, CAL -> C, POT -> P).
+ */
+export const normalizedElement = (element: string, atomName: string, resName: string): string => {
+  const el = element.toUpperCase();
+  if (HYDROGEN_ELEMENTS.has(el)) return 'H';
+  const rn = resName.toUpperCase();
+  if (atomName.toUpperCase() === rn && CHARMM_ION_ELEMENTS[rn]) return CHARMM_ION_ELEMENTS[rn];
+  return el;
+};
+
 const parseNGLAtom = (ap: AtomProxy): AtomData => ({
   index: ap.index,
   name: ap.atomname,
-  element: ap.element.toUpperCase(),
+  element: normalizedElement(ap.element, ap.atomname, ap.resname),
   x: ap.x,
   y: ap.y,
   z: ap.z,
@@ -249,29 +264,43 @@ const findLigandChargedGroups = (atoms: AtomData[], adj: number[][], aromatic: S
   return groups;
 };
 
-/** Protein charged group of one residue, or null if the residue is neutral. */
-const proteinChargedGroup = (resAtoms: AtomData[], metals: AtomData[]): ChargedGroup | null => {
-  const name = resAtoms[0].resName.toUpperCase();
+/**
+ * Protein charged group of one residue (heavy atoms), or null if the residue is neutral.
+ *
+ * Charge states, in order of precedence:
+ *  1. Histidine ring hydrogens, when the file has them: H on both ND1 and NE2 -> cationic,
+ *     on one -> neutral. They are found by geometry (hydrogensOf), so any naming or atom
+ *     order works. Zero ring hydrogens carries no information (a neutral imidazole must
+ *     have one), so it falls through to the residue name.
+ *  2. Residue names that declare a state (HSP/HIP/HISH charged; HSD/HIE/ASH/GLH/LYN/... neutral).
+ *  3. Convention: Asp/Glu/Lys/Arg charged; plain HIS cationic (PLIP) unless metal-bound.
+ * Hydrogen counts are deliberately NOT used for Asp/Glu/Lys/Arg: tools that add hydrogens
+ * by valence (e.g. `obabel -h`) write COOH / NH2 for every residue, which is
+ * indistinguishable from a deliberate choice; MD and preparation tools state deliberate
+ * non-standard states through the residue name instead.
+ */
+const proteinChargedGroup = (
+  resAtoms: AtomData[], hydrogensOf: Map<number, AtomData[]>, metals: AtomData[]
+): ChargedGroup | null => {
+  const raw = resAtoms[0].resName.toUpperCase();
+  const { base, state } = canonicalResidue(raw, resAtoms[0].isHet);
   const pick = (names: string[]) => names.map(n => resAtoms.find(a => a.name === n)).filter((a): a is AtomData => !!a);
   const build = (sign: 1 | -1, names: string[]): ChargedGroup | null => {
     const atoms = pick(names);
-    return atoms.length ? { sign, atoms, center: getCenter(atoms), kind: name } : null;
+    return atoms.length ? { sign, atoms, center: getCenter(atoms), kind: raw } : null;
   };
 
-  if (ATOM_PROPS.NEG_CHARGE_ATOMS[name]) return build(-1, ATOM_PROPS.NEG_CHARGE_ATOMS[name]);
-  if (name === 'ARG' || name === 'LYS') return build(1, ATOM_PROPS.POS_CHARGE_ATOMS[name]);
-  if (CATIONIC_HIS.has(name)) return build(1, ATOM_PROPS.POS_CHARGE_ATOMS.HIS);
-  if (NEUTRAL_HIS.has(name) || name !== 'HIS') return null;
+  if (ATOM_PROPS.NEG_CHARGE_ATOMS[base]) return state === 'neutral' ? null : build(-1, ATOM_PROPS.NEG_CHARGE_ATOMS[base]);
+  if (base === 'ARG' || base === 'LYS') return state === 'neutral' ? null : build(1, ATOM_PROPS.POS_CHARGE_ATOMS[base]);
+  if (base !== 'HIS') return null;
 
-  // Plain 'HIS': protonation is not stated in the file.
-  if (resAtoms.some(a => a.element === 'H')) {
-    // Hydrogens present: cationic only when both ring nitrogens carry one.
-    const hd1 = resAtoms.some(a => a.name === 'HD1');
-    const he2 = resAtoms.some(a => a.name === 'HE2');
-    return hd1 && he2 ? build(1, ATOM_PROPS.POS_CHARGE_ATOMS.HIS) : null;
-  }
-  // No hydrogens: cationic by PLIP convention, except a metal ligand, which is neutral.
   const ringN = pick(ATOM_PROPS.POS_CHARGE_ATOMS.HIS);
+  const protonatedRingN = ringN.filter(n => (hydrogensOf.get(n.index)?.length ?? 0) > 0).length;
+  if (protonatedRingN === 2) return build(1, ATOM_PROPS.POS_CHARGE_ATOMS.HIS);
+  if (protonatedRingN === 1) return null;
+  if (state === 'charged') return build(1, ATOM_PROPS.POS_CHARGE_ATOMS.HIS);
+  if (state === 'neutral') return null;
+  // Plain HIS with no ring hydrogens: cationic by PLIP convention, unless it is a metal ligand.
   if (ringN.some(n => metals.some(m => distance(n, m) <= THRESHOLDS.METAL_DIST))) return null;
   return build(1, ATOM_PROPS.POS_CHARGE_ATOMS.HIS);
 };
@@ -288,92 +317,109 @@ const candidateTier = (name: string): number => {
   return 1;
 };
 
-export const getLigandCandidates = (structure: NGL.Structure): ResidueOption[] => {
-  type Entry = {
-    resName: string; resNo: number; chain: string; atomCount: number;
-    centerX: number; centerY: number; centerZ: number; heavy: Point3D[];
-  };
-  const residueMap: Map<string, Entry> = new Map();
+// Memoised polymer-residue test (called once per atom in large files).
+const polymerNameCache = new Map<string, boolean>();
+const isPolymerName = (name: string): boolean => {
+  let v = polymerNameCache.get(name);
+  if (v === undefined) { v = isPolymerResidueName(name); polymerNameCache.set(name, v); }
+  return v;
+};
 
+/** Is this atom part of the receptor polymer (protein / nucleic acid, incl. modified residues)? */
+const isReceptorResidue = (resName: string, isHetero: boolean): boolean =>
+  MODIFIED_RESIDUES.has(resName.toUpperCase()) || (!isHetero && isPolymerName(resName));
+
+const unitId = (chain: string, resNo: number, insCode: string, resName: string) => `${chain}|${resNo}|${insCode}|${resName}`;
+
+export const getLigandCandidates = (structure: NGL.Structure): ResidueOption[] => {
+  type UnitAtom = { x: number; y: number; z: number; el: string };
+  type Unit = LigandUnit & { atoms: UnitAtom[] };
+  const byId = new Map<string, Unit>();
+
+  // 1. Ligand units: every residue that is not part of the receptor polymer, not water and
+  //    not a lone ion — HETATM groups and, in simulation files (where everything is an ATOM
+  //    record), any residue that is not a standard polymer residue: GLYCAM sugars
+  //    (4GB/3GB/0GB ...), CHARMM BGLC, cofactors, lipids.
   structure.eachResidue((rp) => {
     const name = rp.resname.toUpperCase();
-    if (IGNORED_RESIDUES.has(name) || MODIFIED_RESIDUES.has(name) || rp.isWater()) return;
-    const forced = GENERIC_LIGAND_NAMES.has(name) || COFACTOR_GLYCAN_LIPID.has(name);
-    if (!forced && !rp.isHetero()) return;
-
-    const key = `${rp.chainname}:${rp.resno}:${rp.resname}`;
-    if (residueMap.has(key)) return;
-    let sumX = 0, sumY = 0, sumZ = 0, count = 0;
-    const heavy: Point3D[] = [];
-    const heavyEl: string[] = [];
+    if (rp.isWater() || IGNORED_RESIDUES.has(name) || isReceptorResidue(rp.resname, rp.isHetero())) return;
+    const id = unitId(rp.chainname, rp.resno, rp.inscode || '', rp.resname);
+    let unit = byId.get(id); // the same residue may be split into several NGL residues
     rp.eachAtom((ap) => {
       if (!isPrimaryAltloc(ap)) return;
-      sumX += ap.x; sumY += ap.y; sumZ += ap.z; count++;
-      if (ap.element.toUpperCase() !== 'H') { heavy.push({ x: ap.x, y: ap.y, z: ap.z }); heavyEl.push(ap.element.toUpperCase()); }
-    });
-    if (heavy.length === 0) return;
-    // Lone metal ions under names not listed above are coordination partners, not ligands.
-    if (heavy.length === 1 && isMetalElement(heavyEl[0])) return;
-    residueMap.set(key, {
-      resName: rp.resname, resNo: rp.resno, chain: rp.chainname, atomCount: heavy.length,
-      centerX: sumX / count, centerY: sumY / count, centerZ: sumZ / count, heavy,
+      const el = normalizedElement(ap.element, ap.atomname, ap.resname);
+      if (el === 'H') return;
+      if (!unit) {
+        unit = { resName: rp.resname, resNo: rp.resno, chain: rp.chainname, insCode: rp.inscode || '', atoms: [] };
+        byId.set(id, unit);
+      }
+      unit.atoms.push({ x: ap.x, y: ap.y, z: ap.z, el });
     });
   });
+  // Lone metal or halide ions (whatever their residue name, e.g. CHARMM SOD/CLA) are
+  // coordination partners or counter-ions, not ligands.
+  const units = [...byId.values()].filter(u =>
+    !(u.atoms.length === 1 && (isMetalElement(u.atoms[0].el) || HALIDE_ELEMENTS.has(u.atoms[0].el))));
 
-  // Group residues with same name/chain that are covalently connected (polymer chains).
-  const residues = Array.from(residueMap.values());
-  const grouped: ResidueOption[] = [];
-  const visited = new Set<Entry>();
-
-  // Two residues belong to the same polymer if any pair of their heavy atoms is
-  // within covalent bonding distance. Glycosidic C-O is ~1.40 A and peptide C-N
-  // ~1.33 A, so 1.9 A accepts every real linkage while rejecting mere packing.
-  const POLYMER_BOND_MAX = 1.9;
-  const areBonded = (a: Entry, b: Entry): boolean => {
-    const dc = Math.sqrt((a.centerX - b.centerX) ** 2 + (a.centerY - b.centerY) ** 2 + (a.centerZ - b.centerZ) ** 2);
-    if (dc > 25) return false; // cheap bounding-sphere reject
-    for (const p of a.heavy) {
-      for (const q of b.heavy) {
-        const dx = p.x - q.x, dy = p.y - q.y, dz = p.z - q.z;
-        if (dx * dx + dy * dy + dz * dz <= POLYMER_BOND_MAX * POLYMER_BOND_MAX) return true;
+  // 2. One ligand = one covalently connected set of units, whatever their residue names or
+  //    chain IDs (glucan chains, glycan trees, fragments of a peptidomimetic inhibitor ...).
+  //    Two units are linked when 1–3 of their atom pairs are at covalent-bond distance and no
+  //    atoms overlap (< 0.9 Å): a glycosidic or peptide link is a single bond, while two
+  //    partially occupied ligands modelled in the same place overlap or clash at many pairs.
+  const C = 2.6; // > the longest bond considered (S–S: 1.05 + 1.05 + 0.45)
+  const cellOf = (v: number) => Math.floor(v / C);
+  const grid = new Map<string, [number, number][]>();
+  units.forEach((u, ui) => u.atoms.forEach((a, ai) => {
+    const k = `${cellOf(a.x)},${cellOf(a.y)},${cellOf(a.z)}`;
+    const arr = grid.get(k);
+    if (arr) arr.push([ui, ai]); else grid.set(k, [[ui, ai]]);
+  }));
+  const links = new Map<string, { i: number; j: number; bonds: number; overlap: boolean }>();
+  units.forEach((u, ui) => u.atoms.forEach((a) => {
+    const cx = cellOf(a.x), cy = cellOf(a.y), cz = cellOf(a.z);
+    for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) {
+      for (const [uj, aj] of grid.get(`${cx + dx},${cy + dy},${cz + dz}`) ?? []) {
+        if (uj <= ui) continue;
+        const b = units[uj].atoms[aj];
+        const d = distance(a, b);
+        const overlap = d < 0.9;
+        const bonded = !overlap && !isMetalElement(a.el) && !isMetalElement(b.el)
+          && d <= covalentRadius(a.el) + covalentRadius(b.el) + THRESHOLDS.BOND_TOLERANCE;
+        if (!overlap && !bonded) continue;
+        const key = `${ui}|${uj}`;
+        const l = links.get(key) ?? { i: ui, j: uj, bonds: 0, overlap: false };
+        if (overlap) l.overlap = true; else l.bonds++;
+        links.set(key, l);
       }
     }
-    return false;
-  };
+  }));
+  const root = units.map((_, i) => i);
+  const find = (i: number): number => (root[i] === i ? i : (root[i] = find(root[i])));
+  links.forEach(l => { if (!l.overlap && l.bonds >= 1 && l.bonds <= 3) root[find(l.i)] = find(l.j); });
 
-  for (const res of residues) {
-    if (visited.has(res)) continue;
-    const members: Entry[] = [res];
-    visited.add(res);
-    let changed = true;
-    while (changed) {
-      changed = false;
-      for (const other of residues) {
-        if (visited.has(other)) continue;
-        if (other.resName !== res.resName || other.chain !== res.chain) continue;
-        if (members.some(m => areBonded(other, m))) {
-          members.push(other);
-          visited.add(other);
-          changed = true;
-        }
-      }
-    }
-    const resNos = members.map(m => m.resNo).sort((a, b) => a - b);
-    grouped.push({
-      resName: res.resName,
-      resNo: resNos[0],
-      resNos: resNos.length > 1 ? resNos : undefined,
-      chain: res.chain,
-      atomCount: members.reduce((s, m) => s + m.atomCount, 0),
-    });
-  }
-
-  return grouped.sort((a, b) => {
-    const ta = candidateTier(a.resName.toUpperCase());
-    const tb = candidateTier(b.resName.toUpperCase());
-    if (ta !== tb) return ta - tb;
-    return b.atomCount - a.atomCount;
+  // 3. Candidates, ranked: generic docking names > other hetero groups > cofactors / glycans
+  //    / lipids > additives, detergents and membrane lipids; larger first within a rank.
+  const groups = new Map<number, Unit[]>();
+  units.forEach((u, i) => {
+    const r = find(i);
+    const g = groups.get(r);
+    if (g) g.push(u); else groups.set(r, [u]);
   });
+  const ranked = [...groups.values()].map(g => {
+    g.sort((a, b) => a.chain.localeCompare(b.chain) || a.resNo - b.resNo || a.insCode.localeCompare(b.insCode));
+    const option: ResidueOption = {
+      resName: g[0].resName,
+      resNo: g[0].resNo,
+      resNos: g.length > 1 ? g.map(u => u.resNo) : undefined,
+      chain: g[0].chain,
+      atomCount: g.reduce((n, u) => n + u.atoms.length, 0),
+      units: g.length > 1 ? g.map(({ resName, resNo, chain, insCode }) => ({ resName, resNo, chain, insCode })) : undefined,
+    };
+    return { option, tier: Math.min(...g.map(u => candidateTier(u.resName.toUpperCase()))) };
+  });
+  return ranked
+    .sort((a, b) => (a.tier - b.tier) || (b.option.atomCount - a.option.atomCount))
+    .map(r => r.option);
 };
 
 export const findResidueByName = (structure: NGL.Structure, queryName: string): ResidueOption | null => {
@@ -405,44 +451,59 @@ export const analyzeInteractions = (
   ligandResidue: ResidueOption
 ): AnalysisResult => {
   const interactions: Interaction[] = [];
-  const ligandAtoms: AtomData[] = [];
-  const proteinAtoms: AtomData[] = [];
+  const ligHeavy: AtomData[] = [];
+  const proteinHeavy: AtomData[] = [];
   const metalIons: AtomData[] = [];
+  const otherHeavy: AtomData[] = []; // other hetero groups / counter-ions: possible hydrogen parents only
+  const hydrogens: AtomData[] = [];
   const ligandResNos = ligandResidue.resNos ?? [ligandResidue.resNo];
+  const ligandUnitIds = ligandResidue.units
+    ? new Set(ligandResidue.units.map(u => unitId(u.chain, u.resNo, u.insCode, u.resName)))
+    : null;
 
-  // 1. Extract atoms (primary altloc only).
+  // 1. Extract atoms (primary altloc only). Hydrogens are collected on their own and
+  // attached to their parent atom by GEOMETRY (step 3) — never by name, residue or file
+  // order, which differ between tools: Open Babel writes every H after all heavy atoms,
+  // and PDB / CHARMM / AMBER / GROMACS all name hydrogens differently.
   structure.eachAtom((ap) => {
     if (!isPrimaryAltloc(ap)) return;
-    const isLigand =
-      ligandResNos.includes(ap.resno) &&
-      ap.chainname === ligandResidue.chain &&
-      ap.resname === ligandResidue.resName;
-    if (isLigand) {
-      ligandAtoms.push(parseNGLAtom(ap));
-    } else if (ap.isHetero() && isMetalElement(ap.element.toUpperCase())) {
-      // Metal ions (and metals inside other hetero groups, e.g. a heme Fe) are
-      // coordination partners. Previously every HETATM was dropped, so a ligand
-      // binding a catalytic Zn never showed the coordination.
-      metalIons.push(parseNGLAtom(ap));
-    } else if (!ap.isHetero() || MODIFIED_RESIDUES.has(ap.resname.toUpperCase())) {
-      proteinAtoms.push(parseNGLAtom(ap));
+    const isLigand = ligandUnitIds
+      ? ligandUnitIds.has(unitId(ap.chainname, ap.resno, ap.inscode || '', ap.resname))
+      : ligandResNos.includes(ap.resno) && ap.chainname === ligandResidue.chain && ap.resname === ligandResidue.resName;
+    const water = !isLigand && ap.isWater();
+    const a = parseNGLAtom(ap);
+    if (a.element === 'H') {
+      if (!water) hydrogens.push(a);
+      return;
     }
-    // Waters, other ligands, cofactors and buffers are not partners.
+    if (isLigand) ligHeavy.push(a);
+    // Waters are not partners — including MD waters written as ATOM records (TIP3, WAT, SOL).
+    else if (water) return;
+    // Metal ions, in HETATM or ATOM records (CHARMM ZN2/CAL/SOD), and cofactor metals
+    // (heme Fe) are coordination partners.
+    else if (isMetalElement(a.element)) metalIons.push(a);
+    // Halide counter-ions are not partners.
+    else if (HALIDE_ELEMENTS.has(a.element)) otherHeavy.push(a);
+    // Receptor: protein / nucleic-acid residues (incl. modified ones). In simulation files the
+    // other ATOM-record residues (sugars, lipids, cofactors) are treated like HETATM groups.
+    else if (isReceptorResidue(ap.resname, ap.isHetero())) proteinHeavy.push(a);
+    // Other ligands, cofactors and buffers are not partners.
+    else otherHeavy.push(a);
   });
 
-  const empty: AnalysisResult = { interactions: [], ligandCenter: { x: 0, y: 0, z: 0 }, ligandAtoms, residueAtoms: {} };
-  if (ligandAtoms.length === 0) return empty;
-  const ligandCenter = getCenter(ligandAtoms);
+  if (ligHeavy.length === 0) {
+    return { interactions: [], ligandCenter: { x: 0, y: 0, z: 0 }, ligandAtoms: [], residueAtoms: {}, hydrogens: { ligand: false, receptor: false } };
+  }
   let idCounter = 0;
   const nextId = (p: string) => `${p}-${idCounter++}`;
 
-  // 2. Binding site: every residue with ANY atom within PREFILTER_MARGIN of ANY ligand
-  // atom, taken WHOLE so rings and charged groups straddling the cut-off keep all
-  // their atoms (their centroids were previously computed from a subset).
+  // 2. Binding site: every residue with ANY heavy atom within PREFILTER_MARGIN of ANY
+  // ligand heavy atom, taken WHOLE so rings and charged groups straddling the cut-off
+  // keep all their atoms.
   const M = THRESHOLDS.PREFILTER_MARGIN;
   const grid = new Map<string, AtomData[]>();
   const cell = (v: number) => Math.floor(v / M);
-  for (const a of ligandAtoms) {
+  for (const a of ligHeavy) {
     const k = `${cell(a.x)},${cell(a.y)},${cell(a.z)}`;
     const arr = grid.get(k);
     if (arr) arr.push(a); else grid.set(k, [a]);
@@ -457,22 +518,63 @@ export const analyzeInteractions = (
   };
 
   const allResidues = new Map<number, AtomData[]>();
-  for (const a of proteinAtoms) {
+  for (const a of proteinHeavy) {
     const arr = allResidues.get(a.resKey);
     if (arr) arr.push(a); else allResidues.set(a.resKey, [a]);
   }
-  const residueAtoms: Record<number, AtomData[]> = {};
-  allResidues.forEach((atoms, key) => {
-    if (atoms.some(a => a.element !== 'H' && nearLigand(a))) residueAtoms[key] = atoms;
-  });
-  const siteResidues = Object.values(residueAtoms);
+  const siteResidues: AtomData[][] = [];
+  allResidues.forEach(atoms => { if (atoms.some(nearLigand)) siteResidues.push(atoms); });
   const siteAtoms = siteResidues.flat();
   const metals = metalIons.filter(nearLigand);
-  const ligandMetals = ligandAtoms.filter(a => isMetalElement(a.element));
-  metals.forEach(m => { residueAtoms[m.resKey] = [m]; });
+  const ligandMetals = ligHeavy.filter(a => isMetalElement(a.element));
 
-  // 3. Ligand perception: bond graph, aromatic rings, charged groups.
-  const ligHeavy = ligandAtoms.filter(a => a.element !== 'H');
+  // 3. Hydrogens -> parent heavy atom, purely by distance (nearest heavy atom within
+  // 1.45 Å, which covers S–H at 1.34 Å; a non-bonded heavy atom is never that close).
+  // Independent of atom names, residue grouping and file order.
+  const HYDROGEN_PARENT_MAX = 1.45;
+  const parentPool = [...ligHeavy, ...siteAtoms, ...otherHeavy.filter(nearLigand)];
+  const hydrogensOf = new Map<number, AtomData[]>();
+  if (hydrogens.length > 0 && parentPool.length > 0) {
+    const C = 1.5;
+    const pc = (v: number) => Math.floor(v / C);
+    const pgrid = new Map<string, AtomData[]>();
+    let minX = Infinity, minY = Infinity, minZ = Infinity, maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+    for (const a of parentPool) {
+      const k = `${pc(a.x)},${pc(a.y)},${pc(a.z)}`;
+      const arr = pgrid.get(k);
+      if (arr) arr.push(a); else pgrid.set(k, [a]);
+      minX = Math.min(minX, a.x); minY = Math.min(minY, a.y); minZ = Math.min(minZ, a.z);
+      maxX = Math.max(maxX, a.x); maxY = Math.max(maxY, a.y); maxZ = Math.max(maxZ, a.z);
+    }
+    for (const h of hydrogens) {
+      if (h.x < minX - C || h.x > maxX + C || h.y < minY - C || h.y > maxY + C || h.z < minZ - C || h.z > maxZ + C) continue;
+      let best: AtomData | null = null;
+      let bestD = HYDROGEN_PARENT_MAX;
+      const cx = pc(h.x), cy = pc(h.y), cz = pc(h.z);
+      for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) for (let k = -1; k <= 1; k++) {
+        for (const p of pgrid.get(`${cx + i},${cy + j},${cz + k}`) ?? []) {
+          const d = distance(h, p);
+          if (d <= bestD) { bestD = d; best = p; }
+        }
+      }
+      if (!best) continue;
+      // The hydrogen belongs to its parent's residue, whatever residue the file put it in.
+      const attached: AtomData = { ...h, resKey: best.resKey, resName: best.resName, resNo: best.resNo, chain: best.chain, insCode: best.insCode, isHet: best.isHet };
+      const arr = hydrogensOf.get(best.index);
+      if (arr) arr.push(attached); else hydrogensOf.set(best.index, [attached]);
+    }
+  }
+  const hOf = (a: AtomData) => hydrogensOf.get(a.index) ?? [];
+  const ligandAtoms = [...ligHeavy, ...ligHeavy.flatMap(hOf)];
+  const ligandCenter = getCenter(ligHeavy);
+  const residueAtoms: Record<number, AtomData[]> = {};
+  for (const atoms of siteResidues) residueAtoms[atoms[0].resKey] = [...atoms, ...atoms.flatMap(hOf)];
+  metals.forEach(m => { residueAtoms[m.resKey] = [m]; });
+  // Explicit hydrogens on each side decide whether H-bond angles can be checked (step E).
+  const ligandHasH = ligHeavy.some(a => hOf(a).length > 0);
+  const proteinHasH = siteAtoms.some(a => hOf(a).length > 0);
+
+  // 4. Ligand perception: bond graph, aromatic rings, charged groups.
   const ligAdj = buildAdjacency(ligHeavy);
   const ligRingsIdx = findRings(ligAdj, ligHeavy).filter(r => isAromaticRing(r, ligHeavy, ligAdj));
   const aromaticIdx = new Set(ligRingsIdx.flat());
@@ -484,47 +586,19 @@ export const analyzeInteractions = (
   const ligHeavyPos = new Map(ligHeavy.map((a, i) => [a.index, i]));
   const heavyDegree = new Map<number, number>(ligHeavy.map((a, i) => [a.index, ligAdj[i].length]));
 
-  // 4. Protein perception per site residue.
+  // 5. Protein perception per site residue (heavy atoms; hydrogens via hydrogensOf).
   const allMetals = [...metals, ...ligandMetals];
-  const site = siteResidues.map(atoms => {
-    const heavy = atoms.filter(a => a.element !== 'H');
+  const site = siteResidues.map(heavy => {
     const adj = buildAdjacency(heavy);
     heavy.forEach((a, i) => heavyDegree.set(a.index, adj[i].length));
     const hydrophobic = heavy.filter((a, i) => a.element === 'C' && adj[i].every(j => heavy[j].element === 'C'));
-    const ringDefs = ATOM_PROPS.AROMATIC_RINGS[aromaticResName(atoms[0].resName)] ?? [];
+    const ringDefs = ATOM_PROPS.AROMATIC_RINGS[aromaticResName(heavy[0].resName, heavy[0].isHet)] ?? [];
     const rings = ringDefs
       .map(names => names.map(n => heavy.find(a => a.name === n)))
       .filter((r): r is AtomData[] => r.every(Boolean)) // incomplete rings are skipped, not guessed
       .map(makeRing);
-    return { atoms, heavy, hydrophobic, rings, charge: proteinChargedGroup(atoms, allMetals) };
+    return { atoms: heavy, heavy, hydrophobic, rings, charge: proteinChargedGroup(heavy, hydrogensOf, allMetals) };
   });
-
-  // 5. Hydrogens bonded to each heavy atom (donor-H-acceptor angles).
-  const HYDROGEN_COVALENT_MAX = 1.3;
-  const donorHydrogens = new Map<number, AtomData[]>();
-  const byResidue = new Map<number, AtomData[]>();
-  for (const a of [...ligandAtoms, ...siteAtoms]) {
-    const arr = byResidue.get(a.resKey);
-    if (arr) arr.push(a); else byResidue.set(a.resKey, [a]);
-  }
-  byResidue.forEach(atoms => {
-    for (const h of atoms) {
-      if (h.element !== 'H') continue;
-      let best: AtomData | null = null;
-      let bestD = Infinity;
-      for (const heavy of atoms) {
-        if (heavy.element === 'H') continue;
-        const d = distance(h, heavy);
-        if (d < bestD) { bestD = d; best = heavy; }
-      }
-      if (best && bestD <= HYDROGEN_COVALENT_MAX) {
-        const arr = donorHydrogens.get(best.index);
-        if (arr) arr.push(h); else donorHydrogens.set(best.index, [h]);
-      }
-    }
-  });
-  const ligandHasH = ligandAtoms.some(a => a.element === 'H');
-  const proteinHasH = siteAtoms.some(a => a.element === 'H');
 
   // 6. Metal coordination spheres (atom index -> metals it coordinates).
   const coordinatedBy = new Map<number, Set<number>>();
@@ -670,7 +744,7 @@ export const analyzeInteractions = (
   const maxCut = Math.max(THRESHOLDS.HBOND_DIST, THRESHOLDS.HYDROPHOBIC_DIST, THRESHOLDS.HALOGEN_DIST);
   const siteHydrophobic = new Set(site.flatMap(r => r.hydrophobic.map(a => a.index)));
   const goodDonorH = (donor: AtomData, acceptor: AtomData) =>
-    (donorHydrogens.get(donor.index) ?? []).some(h => angleDeg(donor, h, acceptor) >= THRESHOLDS.HBOND_ANGLE);
+    hOf(donor).some(h => angleDeg(donor, h, acceptor) >= THRESHOLDS.HBOND_ANGLE);
   const hydrophobicCandidates: Interaction[] = [];
 
   for (const l of ligHeavy) {
@@ -774,5 +848,8 @@ export const analyzeInteractions = (
     if (!existing || typeScore(i.type) > typeScore(existing.type)) pairMap.set(key, i);
   }
 
-  return { interactions: [...pairMap.values(), ...ringBased], ligandCenter, ligandAtoms, residueAtoms };
+  return {
+    interactions: [...pairMap.values(), ...ringBased], ligandCenter, ligandAtoms, residueAtoms,
+    hydrogens: { ligand: ligandHasH, receptor: proteinHasH },
+  };
 };

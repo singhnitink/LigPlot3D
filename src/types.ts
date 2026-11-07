@@ -50,12 +50,25 @@ export interface Interaction {
   proteinLabel?: string;
 }
 
-export interface ResidueOption {
+/** One residue of a ligand. */
+export interface LigandUnit {
   resName: string;
-  resNo: number;        // Primary residue number (first in chain)
-  resNos?: number[];    // All residue numbers (for polymer chains like glucans)
+  resNo: number;
   chain: string;
-  atomCount: number;
+  insCode: string;
+}
+
+export interface ResidueOption {
+  resName: string;      // first unit's residue name
+  resNo: number;        // first unit's residue number
+  resNos?: number[];    // all residue numbers (multi-residue ligands)
+  chain: string;        // first unit's chain
+  atomCount: number;    // heavy atoms
+  /**
+   * Every residue of a multi-residue ligand: residues covalently bonded to each other,
+   * whatever their names or chains (glucan chains, glycan trees, peptidomimetic fragments).
+   */
+  units?: LigandUnit[];
 }
 
 export interface AnalysisResult {
@@ -65,4 +78,6 @@ export interface AnalysisResult {
   ligandAtoms: AtomData[];
   /** All atoms of each partner residue within the binding-site prefilter, keyed by resKey. */
   residueAtoms: Record<number, AtomData[]>;
+  /** Whether explicit hydrogens were found (and attached by geometry) on each side. */
+  hydrogens: { ligand: boolean; receptor: boolean };
 }

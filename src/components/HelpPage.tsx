@@ -77,7 +77,7 @@ const HelpPage: React.FC<Props> = ({ onBack }) => {
                                         <td className="px-4 py-3">
                                             Donor–acceptor heavy-atom distance between N, O and S atoms. Each direction is judged on its
                                             donor: if that side of the complex contains explicit hydrogens, the donor must carry a hydrogen
-                                            with a Donor–H···Acceptor angle ≥ {T.HBOND_ANGLE}°; if it has no hydrogens, the distance alone decides.
+                                            with a Donor–H···Acceptor angle ≥ {T.HBOND_ANGLE}°; if it has no hydrogens, the distance alone decides. The line under the table states which applied.
                                         </td>
                                     </tr>
                                     <tr>
@@ -152,12 +152,18 @@ const HelpPage: React.FC<Props> = ({ onBack }) => {
                             <div className="bg-white p-4 rounded-lg border border-slate-200">
                                 <h3 className="font-semibold text-slate-800 mb-2">2. Ligand identification</h3>
                                 <p>
-                                    Hetero groups (HETATM) are ligand candidates. Water, simple ions and modified amino acids such as
-                                    selenomethionine (MSE) are excluded. Candidates are ranked: generic docking names (LIG, UNL, …) first,
-                                    then other hetero groups, then cofactors, glycans and lipids (HEM, NAD, NAG, …), and last
-                                    crystallisation additives and detergents (GOL, EDO, PEG, BOG, …); larger groups first within a rank.
-                                    Covalently linked residues of the same name (e.g. glycan chains) are grouped into one ligand.
-                                    Any residue can also be selected by name with the search box.
+                                    Hetero groups (HETATM) are ligand candidates. In simulation files, where every residue is an ATOM
+                                    record, any residue that is not a standard protein or nucleic-acid residue is a candidate too (for
+                                    example GLYCAM 4GB/3GB/0GB or CHARMM BGLC sugars, cofactors, lipids). Water, simple ions, and modified
+                                    amino acids and nucleotides (MSE, PSU, …) are excluded — they belong to the receptor.
+                                    <strong> Residues covalently bonded to each other form one ligand, whatever their names or chain
+                                    IDs</strong> — a cellulose or mixed-linkage glucan chain, a branched N-glycan, a heparin oligosaccharide —
+                                    so all of its units are analysed together and each contact names its unit. Pieces joined only through
+                                    a metal ion (e.g. a drug bound to heme iron) stay separate; that contact is a metal coordination.
+                                    Candidates are ranked: generic docking names (LIG, UNL, …) first, then other hetero groups, then
+                                    cofactors, glycans and lipids (HEM, NAD, NAG, …), and last additives, detergents and membrane lipids
+                                    (GOL, PEG, BOG, CLR, POPC, …); larger groups first within a rank. Any residue can also be selected by
+                                    name with the search box.
                                 </p>
                             </div>
                             <div className="bg-white p-4 rounded-lg border border-slate-200">
@@ -189,10 +195,25 @@ const HelpPage: React.FC<Props> = ({ onBack }) => {
                                         <strong>Ligand anions:</strong> carboxylate, phosphate/phosphonate, sulfate/sulfonate.
                                     </li>
                                     <li>
-                                        <strong>Histidine:</strong> force-field names state the charge (HSP/HIP/HISH cationic;
-                                        HSD/HSE/HID/HIE neutral). For plain HIS, explicit hydrogens decide (cationic only with both
-                                        HD1 and HE2); without hydrogens it is treated as cationic (PLIP convention) unless it
+                                        <strong>Hydrogens:</strong> each hydrogen (or deuterium) is assigned to the nearest heavy atom
+                                        within 1.45 Å. Hydrogen names, the residue they are written in and their order in the file do
+                                        not matter, so PDB, CHARMM, AMBER, GROMACS, Open Babel and docking-tool files are read alike.
+                                    </li>
+                                    <li>
+                                        <strong>Histidine:</strong> if the file has hydrogens on its ring nitrogens, they decide — on both
+                                        ND1 and NE2 cationic, on one neutral. Otherwise the residue name decides (HSP/HIP/HISH cationic;
+                                        HSD/HSE/HID/HIE/HISD/HISE neutral); plain HIS is treated as cationic (PLIP convention) unless it
                                         coordinates a metal ion.
+                                    </li>
+                                    <li>
+                                        <strong>Other residues:</strong> Asp, Glu, Lys and Arg are charged unless the residue name declares
+                                        otherwise (ASH/ASPP/ASPH, GLH/GLUP/GLUH, LYN/LSN/LYSN, ARN). Their hydrogens are not used for this,
+                                        because tools that add hydrogens by valence write neutral COOH/NH₂ for every residue.
+                                    </li>
+                                    <li>
+                                        <strong>Simulation files:</strong> waters written as ATOM records (TIP3, WAT, SOL …) are not
+                                        partners, and CHARMM ions (SOD, POT, CAL, CLA …) are recognised as ions even without an
+                                        element column.
                                     </li>
                                 </ul>
                             </div>
@@ -258,7 +279,7 @@ const HelpPage: React.FC<Props> = ({ onBack }) => {
                         <h2 className="text-2xl font-bold text-slate-800 mb-4">Limitations</h2>
                         <ul className="list-disc pl-5 space-y-2 text-slate-600">
                             <li>Hydrogen atoms are often missing from structure files; H-bond detection then relies on heavy-atom distances and cannot tell donors from acceptors.</li>
-                            <li>Protonation states are assumed (amines and carboxylates charged; His as described above), not computed.</li>
+                            <li>Protonation states are assigned by the rules above, not computed: ligand amines and acids are treated as ionised even when the file's hydrogens show a neutral form.</li>
                             <li>Chemistry is perceived from geometry; badly distorted ligand geometries can be misclassified.</li>
                             <li>Water-mediated hydrogen bonds are not detected.</li>
                             <li>Covalent bonds between ligand and protein are not analyzed.</li>

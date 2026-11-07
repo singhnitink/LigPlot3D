@@ -38,10 +38,15 @@ const ALL_ON = Object.fromEntries(INTERACTION_ORDER.map(t => [t, true])) as Reco
 const isHelpHash = () => window.location.hash === '#help';
 
 const ligandOptionText = (lig: ResidueOption) => {
-  const chain = lig.chain || '–';
-  return lig.resNos && lig.resNos.length > 1
-    ? `${lig.resName} ${lig.resNos[0]}-${lig.resNos[lig.resNos.length - 1]} (Chain ${chain}) [${lig.resNos.length} units]`
-    : `${lig.resName} ${lig.resNo} (Chain ${chain})`;
+  if (lig.units && lig.units.length > 1) {
+    // Multi-residue ligand (glucan chain, glycan tree ...): residue names, number range, chains.
+    const names = [...new Set(lig.units.map(u => u.resName))];
+    const chains = [...new Set(lig.units.map(u => u.chain || '–'))];
+    const nameText = names.length <= 3 ? names.join('/') : `${names.slice(0, 3).join('/')}…`;
+    const first = lig.units[0], last = lig.units[lig.units.length - 1];
+    return `${nameText} ${first.resNo}${first.insCode}-${last.resNo}${last.insCode} (Chain ${chains.join(',')}) [${lig.units.length} units]`;
+  }
+  return `${lig.resName} ${lig.resNo} (Chain ${lig.chain || '–'})`;
 };
 
 interface PdbIdFormProps {
@@ -237,7 +242,9 @@ const App: React.FC = () => {
   const handleManualSearch = () => {
     const q = manualSearchQuery.trim().toUpperCase();
     if (!prepared || !q) return;
-    const existing = ligandCandidates.find(l => l.resName.toUpperCase() === q);
+    // A residue that belongs to a multi-residue ligand selects that whole ligand.
+    const existing = ligandCandidates.find(l =>
+      l.resName.toUpperCase() === q || l.units?.some(u => u.resName.toUpperCase() === q));
     const found = existing ?? findResidueByName(prepared.structure, q);
     if (found) {
       if (!existing) setLigandCandidates(prev => [found, ...prev]);
@@ -638,6 +645,7 @@ const App: React.FC = () => {
                   fileName={fileBase}
                   ligandLabel={ligandLabel}
                   onShowAll={() => setInteractionFilters(ALL_ON)}
+                  hydrogens={analysisResult?.hydrogens}
                 />
               </div>
             </div>

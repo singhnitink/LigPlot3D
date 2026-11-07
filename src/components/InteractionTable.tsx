@@ -16,6 +16,8 @@ interface Props {
   /** e.g. "PBE 1001 (A)" */
   ligandLabel: string;
   onShowAll: () => void;
+  /** Explicit hydrogens found on each side (decides whether H-bond angles were checked). */
+  hydrogens?: { ligand: boolean; receptor: boolean };
 }
 
 const residueText = (a: Interaction['proteinAtom']) => `${a.resName} ${a.resNo}${a.insCode}`;
@@ -41,7 +43,15 @@ const download = (content: BlobPart, type: string, name: string) => {
 
 const safe = (s: string) => s.replace(/[^A-Za-z0-9._-]+/g, '_').replace(/^_+|_+$/g, '');
 
-const InteractionTable: React.FC<Props> = ({ interactions, totalCount, state, fileName, ligandLabel, onShowAll }) => {
+const hydrogenNote = (h?: { ligand: boolean; receptor: boolean }): string => {
+  if (!h) return '';
+  if (h.ligand && h.receptor) return 'H-bond angles checked using the file’s hydrogens';
+  if (h.ligand) return 'H-bond angles checked for ligand donors; receptor has no hydrogens (distance only)';
+  if (h.receptor) return 'H-bond angles checked for receptor donors; ligand has no hydrogens (distance only)';
+  return 'No hydrogens in file: H-bonds from heavy-atom distances';
+};
+
+const InteractionTable: React.FC<Props> = ({ interactions, totalCount, state, fileName, ligandLabel, onShowAll, hydrogens }) => {
 
   const sortedInteractions = useMemo(() => {
     return [...interactions].sort((a, b) => {
@@ -51,6 +61,10 @@ const InteractionTable: React.FC<Props> = ({ interactions, totalCount, state, fi
   }, [interactions]);
 
   const exportBase = `${safe(fileName) || 'structure'}_${safe(ligandLabel) || 'ligand'}_interactions`;
+  // Multi-residue ligands (e.g. an 18-unit glucan): atom names alone are ambiguous, so the
+  // table also names the ligand residue of each contact.
+  const multiUnit = new Set(interactions.map(i => `${i.ligandAtom.chain}|${i.ligandAtom.resNo}|${i.ligandAtom.insCode}|${i.ligandAtom.resName}`)).size > 1;
+  const ligandCell = (i: Interaction) => (multiUnit ? `${residueText(i.ligandAtom)} · ${ligandText(i)}` : ligandText(i));
 
   const downloadCSV = () => {
     const headers = [
@@ -103,6 +117,7 @@ const InteractionTable: React.FC<Props> = ({ interactions, totalCount, state, fi
       <div className="px-3 md:px-4 py-2 bg-white border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-slate-500">
           {interactions.length === totalCount ? `${totalCount} interactions` : `${interactions.length} of ${totalCount} interactions shown`}
+          {hydrogens && <span className="hidden sm:inline" data-testid="hydrogen-note"> · {hydrogenNote(hydrogens)}</span>}
         </p>
         <div className="flex gap-2">
           <button type="button" onClick={downloadCSV} className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium bg-slate-100 border border-slate-300 rounded hover:bg-slate-200 text-slate-700">
@@ -147,7 +162,7 @@ const InteractionTable: React.FC<Props> = ({ interactions, totalCount, state, fi
                     )}
                   </td>
                   <td className="px-2 md:px-4 py-2 text-slate-600">
-                    {ligandText(interaction)}
+                    {ligandCell(interaction)}
                     {!interaction.ligandLabel && (
                       <span className="hidden md:inline text-slate-400 text-xs"> ({interaction.ligandAtom.element})</span>
                     )}
