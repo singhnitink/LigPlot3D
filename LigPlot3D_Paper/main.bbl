@@ -8,7 +8,7 @@
 \providecommand*\mcitethebibliography{\thebibliography}
 \csname @ifundefined\endcsname{endmcitethebibliography}
   {\let\endmcitethebibliography\endthebibliography}{}
-\begin{mcitethebibliography}{20}
+\begin{mcitethebibliography}{22}
 \providecommand*\natexlab[1]{#1}
 \providecommand*\mciteSetBstSublistMode[1]{}
 \providecommand*\mciteSetBstMaxWidthForm[2]{}
@@ -59,6 +59,13 @@ Laskowski,~R.~A.; Swindells,~M.~B. LigPlot+: multiple ligand--protein
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
+\bibitem[Rego and Koes(2015)Rego, and Koes]{rego20153dmol}
+Rego,~N.; Koes,~D. 3Dmol. js: molecular visualization with WebGL.
+  \emph{Bioinformatics} \textbf{2015}, \emph{31}, 1322--1324\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
 \bibitem[Rose and Hildebrand(2015)Rose, and Hildebrand]{rose2015ngl}
 Rose,~A.~S.; Hildebrand,~P.~W. NGL Viewer: a web application for molecular
   visualization. \emph{Nucleic acids research} \textbf{2015}, \emph{43},
@@ -76,9 +83,12 @@ Rose,~A.~S.; Bradley,~A.~R.; Valasatava,~Y.; Duarte,~J.~M.; Prli{\'c},~A.;
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
 \EndOfBibitem
-\bibitem[Rego and Koes(2015)Rego, and Koes]{rego20153dmol}
-Rego,~N.; Koes,~D. 3Dmol. js: molecular visualization with WebGL.
-  \emph{Bioinformatics} \textbf{2015}, \emph{31}, 1322--1324\relax
+\bibitem[Cordero \latin{et~al.}(2008)Cordero, G{\'o}mez, Platero-Prats,
+  Rev{\'e}s, Echeverr{\'i}a, Cremades, Barrag{\'a}n, and
+  Alvarez]{cordero2008covalent}
+Cordero,~B.; G{\'o}mez,~V.; Platero-Prats,~A.~E.; Rev{\'e}s,~M.;
+  Echeverr{\'i}a,~J.; Cremades,~E.; Barrag{\'a}n,~F.; Alvarez,~S. Covalent
+  radii revisited. \emph{Dalton Transactions} \textbf{2008}, 2832--2838\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
@@ -139,6 +149,14 @@ Gallivan,~J.~P.; Dougherty,~D.~A. Cation-$\pi$ interactions in structural
 Auffinger,~P.; Hays,~F.~A.; Westhof,~E.; Ho,~P.~S. Halogen bonds in biological
   molecules. \emph{Proceedings of the National Academy of Sciences}
   \textbf{2004}, \emph{101}, 16789--16794\relax
+\mciteBstWouldAddEndPuncttrue
+\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
+{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
+\EndOfBibitem
+\bibitem[Harding(2001)]{harding2001geometry}
+Harding,~M.~M. Geometry of metal--ligand interactions in proteins. \emph{Acta
+  Crystallographica Section D: Biological Crystallography} \textbf{2001},
+  \emph{57}, 401--411\relax
 \mciteBstWouldAddEndPuncttrue
 \mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}
 {\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax
