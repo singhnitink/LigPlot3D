@@ -1,10 +1,10 @@
 \documentclass[11pt]{letter}
-\usepackage[top=0.75in,bottom=0.75in,left=0.95in,right=0.95in]{geometry}
-\usepackage{url}
+\usepackage[top=0.65in,bottom=0.65in,left=0.85in,right=0.85in]{geometry}
+\usepackage{xurl}
 
 % The letter class uses a generous \parskip and reserves 6\medskipamount above
 % the signature. Both are trimmed so the letter fits on a single page.
-\setlength{\parskip}{0.35\baselineskip}
+\setlength{\parskip}{0.3\baselineskip}
 \makeatletter
 \renewcommand{\closing}[1]{\par\nobreak\vspace{\parskip}%
   \stopbreaks
@@ -12,7 +12,7 @@
   \ifx\@empty\fromaddress\else
   \hspace*{\longindentation}\fi
   \parbox{\indentedwidth}{\raggedright
-       \ignorespaces #1\\[1.5\medskipamount]%
+       \ignorespaces #1\\[1.2\medskipamount]%
        \ifx\@empty\fromsig
            \fromname
        \else \fromsig \fi\strut}%
@@ -31,22 +31,21 @@ singh\_nitin@iitgn.ac.in}
 
 \begin{document}
 
-\begin{letter}{Editors-in-Chief\\
-Biophysical Chemistry}
+\begin{letter}{The Editors\\
+\textit{Molecular Informatics}\\
+Wiley-VCH GmbH}
 
 \opening{Dear Editors,}
 
-I am pleased to submit our manuscript titled \textbf{``LigPlot3D: An Interactive Web-Based Framework for Geometric Analysis of Protein--Ligand Interactions''} for consideration as an original research article in \textit{Biophysical Chemistry}.
+I am pleased to submit our manuscript titled \textbf{``LigPlot3D\,: An Interactive Web-Based Framework for Geometric Analysis of Protein--Ligand Interactions''} for consideration for publication as an \textbf{Application Note} in \textit{Molecular Informatics}.
 
-Characterizing non-covalent interactions at protein--ligand interfaces is fundamental to understanding the physical-chemical principles of molecular recognition, binding affinity, and structural specificity. While molecular docking generates candidate poses, systematically dissecting contact geometries across multiple poses remains a practical bottleneck. Existing interaction profilers are designed primarily for batch workflows, 2D schematics obscure three-dimensional spatial arrangements, and most tools require complex local installations or remote server uploads. This leaves a notable gap for researchers seeking rapid, privacy-preserving, and interactive biophysical evaluation of binding modes directly within the browser.
+Characterizing non-covalent interactions at protein--ligand interfaces is foundational to computational chemistry, molecular informatics, and structure-based drug design. With recent advances in generative chemistry and high-throughput molecular docking, candidate poses can now be generated at unprecedented scale. However, systematically dissecting and validating 3D contact geometries across candidate poses remains a significant bottleneck. Existing profilers are predominantly batch-oriented command-line utilities, 2D schematics that obscure spatial relationships, or desktop tools requiring complex local software stacks. Furthermore, server-dependent web platforms introduce latency and raise critical data-privacy concerns for proprietary chemical compounds.
 
-LigPlot3D addresses this need as an open-source, client-side web application where structure parsing, interaction detection, and 3D molecular rendering execute entirely in the user's browser. Because computations run locally, structural data never leave the client machine, eliminating server dependencies and safeguarding proprietary compounds. LigPlot3D deterministically identifies key non-covalent interactions governing biomolecular complexes (hydrogen bonds, salt bridges, hydrophobic contacts, $\pi$-stacking, cation--$\pi$ interactions, and halogen bonds), presenting them simultaneously through synchronized 3D WebGL scenes and exportable interaction tables.
+LigPlot3D addresses these challenges as an open-source, client-side web framework that performs molecular parsing, geometric interaction profiling, and interactive 3D rendering entirely within the user's browser. Built on modern web standards (HTML5, JavaScript, and Three.js/WebGL), LigPlot3D operates with zero installation and ensures that structural coordinates never leave the client machine, eliminating server overhead and safeguarding confidential data. The framework deterministically detects the full spectrum of non-covalent interactions, including hydrogen bonds, salt bridges, hydrophobic contacts, $\pi$-stacking interactions, and halogen bonds, while synchronizing rich 3D spatial scenes with exportable, structured interaction tables readily usable for downstream computational analysis.
 
-Several aspects of this work should be of strong interest to the readership of \textit{Biophysical Chemistry}. First, rather than relying on heuristic scoring, each interaction criterion is derived from published geometric conventions with explicit distance and angle cutoffs documented in the interface, ensuring transparent and reproducible contact assignments. Second, the manuscript presents a quantitative benchmark comparing these thresholds against an established interaction profiler (PLIP), discussing how boundary formulations influence contact identification in macromolecular interfaces. Finally, the framework is validated on a benchmark complex with experimentally characterized binding determinants, accurately capturing the aromatic cage, salt bridge, and hydrogen-bonding networks that stabilize the ligand.
+Several aspects of this work align directly with the aims and scope of \textit{Molecular Informatics}. First, rather than relying on opaque heuristics, each interaction rule is derived from established geometric standards with explicit distance and angle thresholds, providing transparent and reproducible contact assignments vital for post-docking analysis and computer-assisted molecular design. Second, we present a quantitative benchmark against an established interaction profiler (PLIP), systematically evaluating how geometric boundary formulations influence contact identification in macromolecular interfaces, alongside validation on an experimentally characterized protein--ligand complex. Finally, by eliminating local setup barriers and server dependencies, LigPlot3D provides an accessible web informatics platform that streamlines visual inspection and feature extraction for molecular docking pipelines and structure--activity relationship studies.
 
-This work directly aligns with the scope of \textit{Biophysical Chemistry} by providing a reproducible, accessible method to analyze protein--ligand binding interactions directly in the web browser without requiring any local installation or remote servers. LigPlot3D is freely accessible at \url{https://singhnitink.github.io/LigPlot3D/}, with all source code openly available.
-
-This manuscript is original, has not been published elsewhere, and is not under consideration by any other journal. There are no conflicts of interest to declare. Thank you very much for your time and consideration of this submission.
+The tool is publicly accessible at \url{https://singhnitink.github.io/LigPlot3D/}, with all source code freely available at \url{https://github.com/singhnitink/LigPlot3D} under the MIT license. This manuscript is original, has not been published elsewhere, and is not currently under consideration by any other journal. I have no conflicts of interest to declare. Thank you very much for your time and consideration of our submission.
 
 \closing{Sincerely,}
 
